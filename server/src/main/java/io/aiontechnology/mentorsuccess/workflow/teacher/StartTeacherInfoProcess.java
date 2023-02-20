@@ -20,7 +20,6 @@ import io.aiontechnology.mentorsuccess.model.inbound.InboundInvitation;
 import io.aiontechnology.mentorsuccess.service.StudentRegistrationService;
 import io.aiontechnology.mentorsuccess.workflow.TaskUtilities;
 import lombok.RequiredArgsConstructor;
-import org.flowable.engine.RuntimeService;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Service;
@@ -34,9 +33,6 @@ import static io.aiontechnology.mentorsuccess.workflow.RegistrationWorkflowConst
 @Service
 @RequiredArgsConstructor
 public class StartTeacherInfoProcess implements JavaDelegate {
-
-    // Flowable
-    private final RuntimeService runtimeService;
 
     // Services
     private final StudentRegistrationService studentRegistrationService;

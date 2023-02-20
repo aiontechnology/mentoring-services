@@ -25,6 +25,7 @@
              typeLanguage="http://www.w3.org/2001/XMLSchema"
              expressionLanguage="http://www.w3.org/1999/XPath"
              targetNamespace="http://www.flowable.org/processdef">
+    <error id="cancelProcess" errorCode="cancelProcess"/>
     <process id="request-student-info" name="Teacher: Request student information" isExecutable="true">
 
         <!-- States -->
@@ -95,10 +96,16 @@
             </extensionElements>
         </callActivity>
 
-        <boundaryEvent id="requestInfo1Timeout" attachedToRef="requestInfo1">
+        <boundaryEvent id="requestInfo1Timeout"
+                       attachedToRef="requestInfo1">
             <timerEventDefinition>
                 <timeDuration>${registrationTimeout}</timeDuration>
             </timerEventDefinition>
+        </boundaryEvent>
+
+        <boundaryEvent id="catchInfo1Error"
+                       attachedToRef="requestInfo1">
+            <errorEventDefinition errorRef="cancelProcess"/>
         </boundaryEvent>
 
         <callActivity id="requestInfo2"
@@ -129,6 +136,45 @@
                 <timeDuration>${registrationTimeout}</timeDuration>
             </timerEventDefinition>
         </boundaryEvent>
+
+        <boundaryEvent id="catchInfo2Error"
+                       attachedToRef="requestInfo2">
+            <errorEventDefinition errorRef="cancelProcess"/>
+        </boundaryEvent>
+
+        <serviceTask id="processCancellation"
+                     name="Process Cancellation"
+                     flowable:delegateExpression="${processInformationCancellationTask}"/>
+
+        <serviceTask id="generateCancellationEmail"
+                     name="Generate Process Cancellation Email"
+                     flowable:delegateExpression="${informationEmailGenerationCancellationTask}">
+            <documentation>
+                Generate an email to inform the program administrator that the student registration has been cancelled.
+            </documentation>
+        </serviceTask>
+
+        <serviceTask id="sendCancellationEmail"
+                     name="Send Cancellation Email"
+                     flowable:type="mail">
+            <documentation>
+                Send a notification to the teacher that a student info request has been cancelled
+            </documentation>
+            <extensionElements>
+                <flowable:field name="to">
+                    <flowable:expression><![CDATA[${email.to}]]></flowable:expression>
+                </flowable:field>
+                <flowable:field name="from">
+                    <flowable:expression><![CDATA[${email.from}]]></flowable:expression>
+                </flowable:field>
+                <flowable:field name="subject">
+                    <flowable:expression> <![CDATA[${email.subject}]]> </flowable:expression>
+                </flowable:field>
+                <flowable:field name="html">
+                    <flowable:expression><![CDATA[${email.body}]]></flowable:expression>
+                </flowable:field>
+            </extensionElements>
+        </serviceTask>
 
         <serviceTask id="generateTeacherInvalidEmail"
                      name="Generate teacher not valid email"
@@ -194,7 +240,7 @@
         <sequenceFlow id="sendTeacherInvalidEmailToEnd"
                       sourceRef="sendTeacherInvalidEmail"
                       targetRef="end"/>
-        <sequenceFlow id="StoreProcessStartToRequestInfo1"
+        <sequenceFlow id="storeProcessStartToRequestInfo1"
                       sourceRef="storeProcessStart"
                       targetRef="requestInfo1"/>
         <sequenceFlow id="requestInfo1ToReceiveInfo1"
@@ -203,12 +249,18 @@
         <sequenceFlow id="requestInfo1TimeoutToRequestInfo2"
                       sourceRef="requestInfo1Timeout"
                       targetRef="requestInfo2"/>
+        <sequenceFlow id="catchInfo1ErrorToGenerateCancellationEmail"
+                      sourceRef="catchInfo1Error"
+                      targetRef="processCancellation"/>
         <sequenceFlow id="requestInfo2ToReceiveInfo2"
                       sourceRef="requestInfo2"
                       targetRef="receiveInfo2"/>
         <sequenceFlow id="requestInfo2TimeoutToGenerateTeacherInformationTimeoutEmail"
                       sourceRef="requestInfo2Timeout"
                       targetRef="generateTeacherInformationTimeoutEmail"/>
+        <sequenceFlow id="catchInfo2ErrorToGenerateCancellationEmail"
+                      sourceRef="catchInfo2Error"
+                      targetRef="processCancellation"/>
         <sequenceFlow id="generateTeacherInformationTimeoutEmailToSendTeacherInformationTimeoutEmail"
                       sourceRef="generateTeacherInformationTimeoutEmail"
                       targetRef="sendTeacherInformationTimeoutEmail"/>
@@ -224,6 +276,15 @@
         <sequenceFlow id="sendTeacherInformationTimeoutEmailToEnd"
                       sourceRef="sendTeacherInformationTimeoutEmail"
                       targetRef="end"/>
+        <sequenceFlow id="processCancellationToGenerateCancellationEmail"
+                      sourceRef="processCancellation"
+                      targetRef="generateCancellationEmail"/>
+        <sequenceFlow id="generateCancellationEmailToSendCancellationEmail"
+                      sourceRef="generateCancellationEmail"
+                      targetRef="sendCancellationEmail"/>
+        <sequenceFlow id="sendCancellationEmailToEnd"
+                      sourceRef="sendCancellationEmail"
+                      targetRef="end"/>
     </process>
     <bpmndi:BPMNDiagram id="BPMNDiagram_request-student-info">
         <bpmndi:BPMNPlane bpmnElement="request-student-info" id="BPMNPlane_request-student-info">
@@ -234,96 +295,133 @@
                 <omgdc:Bounds height="60.0" width="100.0" x="150.0" y="80.0"></omgdc:Bounds>
             </bpmndi:BPMNShape>
             <bpmndi:BPMNShape bpmnElement="checkForTeacher" id="BPMNShape_checkForTeacher">
-                <omgdc:Bounds height="40.0" width="40.0" x="300.0" y="90.0"></omgdc:Bounds>
+                <omgdc:Bounds height="40.0" width="40.0" x="330.0" y="90.0"></omgdc:Bounds>
             </bpmndi:BPMNShape>
             <bpmndi:BPMNShape bpmnElement="storeProcessStart" id="BPMNShape_storeProcessStart">
-                <omgdc:Bounds height="60.0" width="100.0" x="390.0" y="160.0"></omgdc:Bounds>
+                <omgdc:Bounds height="60.0" width="100.0" x="450.0" y="170.0"></omgdc:Bounds>
             </bpmndi:BPMNShape>
             <bpmndi:BPMNShape bpmnElement="generateTeacherInformationTimeoutEmail"
                               id="BPMNShape_generateTeacherInformationTimeoutEmail">
-                <omgdc:Bounds height="60.0" width="100.0" x="632.6213203435597" y="495.0"></omgdc:Bounds>
+                <omgdc:Bounds height="60.0" width="100.0" x="661.9142135623731" y="525.0"></omgdc:Bounds>
             </bpmndi:BPMNShape>
             <bpmndi:BPMNShape bpmnElement="sendTeacherInformationTimeoutEmail"
                               id="BPMNShape_sendTeacherInformationTimeoutEmail">
-                <omgdc:Bounds height="60.0" width="100.0" x="825.0" y="495.0"></omgdc:Bounds>
+                <omgdc:Bounds height="60.0" width="100.0" x="810.0" y="525.0"></omgdc:Bounds>
             </bpmndi:BPMNShape>
             <bpmndi:BPMNShape bpmnElement="requestInfo1" id="BPMNShape_requestInfo1">
-                <omgdc:Bounds height="60.0" width="100.0" x="571.2071067811866" y="160.0"></omgdc:Bounds>
+                <omgdc:Bounds height="60.0" width="100.0" x="600.0" y="170.0"></omgdc:Bounds>
             </bpmndi:BPMNShape>
             <bpmndi:BPMNShape bpmnElement="receiveInfo1" id="BPMNShape_receiveInfo1">
-                <omgdc:Bounds height="60.0" width="100.0" x="825.0" y="160.0"></omgdc:Bounds>
+                <omgdc:Bounds height="60.0" width="100.0" x="825.0" y="170.0"></omgdc:Bounds>
             </bpmndi:BPMNShape>
             <bpmndi:BPMNShape bpmnElement="requestInfo1Timeout" id="BPMNShape_requestInfo1Timeout">
-                <omgdc:Bounds height="31.0" width="31.0" x="636.4142135623731" y="205.20710678118655"></omgdc:Bounds>
+                <omgdc:Bounds height="31.0" width="31.0" x="665.7071067811866" y="215.70710678118655"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="catchInfo1Error" id="BPMNShape_catchInfo1Error">
+                <omgdc:Bounds height="30.0" width="30.0" x="615.0" y="216.20710678118655"></omgdc:Bounds>
             </bpmndi:BPMNShape>
             <bpmndi:BPMNShape bpmnElement="requestInfo2" id="BPMNShape_requestInfo2">
-                <omgdc:Bounds height="60.0" width="100.0" x="601.9142135623731" y="345.0"></omgdc:Bounds>
+                <omgdc:Bounds height="60.0" width="100.0" x="631.2071067811866" y="375.0"></omgdc:Bounds>
             </bpmndi:BPMNShape>
             <bpmndi:BPMNShape bpmnElement="receiveInfo2" id="BPMNShape_receiveInfo2">
-                <omgdc:Bounds height="60.0" width="100.0" x="825.0" y="345.0"></omgdc:Bounds>
+                <omgdc:Bounds height="60.0" width="100.0" x="810.0" y="375.0"></omgdc:Bounds>
             </bpmndi:BPMNShape>
             <bpmndi:BPMNShape bpmnElement="requestInfo2Timeout" id="BPMNShape_requestInfo2Timeout">
-                <omgdc:Bounds height="31.0" width="31.0" x="667.1213203435597" y="390.20710678118655"></omgdc:Bounds>
+                <omgdc:Bounds height="31.0" width="31.0" x="696.4142135623731" y="420.20710678118655"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="processCancellation" id="BPMNShape_processCancellation">
+                <omgdc:Bounds height="60.0" width="100.0" x="405.0" y="690.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="generateCancellationEmail" id="BPMNShape_generateCancellationEmail">
+                <omgdc:Bounds height="60.0" width="100.0" x="580.0" y="690.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="sendCancellationEmail" id="BPMNShape_sendCancellationEmail">
+                <omgdc:Bounds height="60.0" width="100.0" x="750.0" y="690.0"></omgdc:Bounds>
             </bpmndi:BPMNShape>
             <bpmndi:BPMNShape bpmnElement="generateTeacherInvalidEmail" id="BPMNShape_generateTeacherInvalidEmail">
-                <omgdc:Bounds height="60.0" width="100.0" x="390.0" y="0.0"></omgdc:Bounds>
+                <omgdc:Bounds height="60.0" width="100.0" x="450.0" y="10.0"></omgdc:Bounds>
             </bpmndi:BPMNShape>
             <bpmndi:BPMNShape bpmnElement="sendTeacherInvalidEmail" id="BPMNShape_sendTeacherInvalidEmail">
-                <omgdc:Bounds height="60.0" width="100.0" x="571.2071067811866" y="0.0"></omgdc:Bounds>
+                <omgdc:Bounds height="60.0" width="100.0" x="600.0" y="10.0"></omgdc:Bounds>
             </bpmndi:BPMNShape>
             <bpmndi:BPMNShape bpmnElement="storeProcessFinished" id="BPMNShape_storeProcessFinished">
-                <omgdc:Bounds height="60.0" width="100.0" x="960.0" y="255.0"></omgdc:Bounds>
+                <omgdc:Bounds height="60.0" width="100.0" x="960.0" y="270.0"></omgdc:Bounds>
             </bpmndi:BPMNShape>
             <bpmndi:BPMNShape bpmnElement="end" id="BPMNShape_end">
-                <omgdc:Bounds height="28.0" width="28.0" x="1110.0" y="271.0"></omgdc:Bounds>
+                <omgdc:Bounds height="28.0" width="28.0" x="1125.0" y="286.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="catchInfo2Error" id="BPMNShape_catchInfo2Error">
+                <omgdc:Bounds height="30.0" width="30.0" x="642.8964829034329" y="420.79735005747244"></omgdc:Bounds>
             </bpmndi:BPMNShape>
             <bpmndi:BPMNEdge bpmnElement="generateTeacherInformationTimeoutEmailToSendTeacherInformationTimeoutEmail"
                              id="BPMNEdge_generateTeacherInformationTimeoutEmailToSendTeacherInformationTimeoutEmail"
                              flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="50.0"
                              flowable:targetDockerY="30.0">
-                <omgdi:waypoint x="732.5713203435596" y="525.0"></omgdi:waypoint>
-                <omgdi:waypoint x="824.9999999997196" y="525.0"></omgdi:waypoint>
+                <omgdi:waypoint x="761.8642135623419" y="555.0"></omgdi:waypoint>
+                <omgdi:waypoint x="810.0" y="555.0"></omgdi:waypoint>
             </bpmndi:BPMNEdge>
             <bpmndi:BPMNEdge bpmnElement="requestInfo1TimeoutToRequestInfo2"
                              id="BPMNEdge_requestInfo1TimeoutToRequestInfo2" flowable:sourceDockerX="15.500000000000002"
                              flowable:sourceDockerY="15.500000000000002" flowable:targetDockerX="50.0"
                              flowable:targetDockerY="30.0">
-                <omgdi:waypoint x="651.9142135623731" y="236.15710598786572"></omgdi:waypoint>
-                <omgdi:waypoint x="651.9142135623731" y="345.0"></omgdi:waypoint>
+                <omgdi:waypoint x="681.0769924953353" y="246.6565737591793"></omgdi:waypoint>
+                <omgdi:waypoint x="680.0" y="375.0"></omgdi:waypoint>
+                <omgdi:waypoint x="681.2071067811866" y="375.0"></omgdi:waypoint>
+                <omgdi:waypoint x="681.2071067811866" y="375.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="catchInfo1ErrorToGenerateCancellationEmail"
+                             id="BPMNEdge_catchInfo1ErrorToGenerateCancellationEmail" flowable:sourceDockerX="15.0"
+                             flowable:sourceDockerY="15.0" flowable:targetDockerX="50.0" flowable:targetDockerY="30.0">
+                <omgdi:waypoint x="617.4397389972878" y="239.38289768233867"></omgdi:waypoint>
+                <omgdi:waypoint x="455.0" y="345.5"></omgdi:waypoint>
+                <omgdi:waypoint x="455.0" y="690.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="storeProcessStartToRequestInfo1" id="BPMNEdge_storeProcessStartToRequestInfo1"
+                             flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="50.0"
+                             flowable:targetDockerY="30.0">
+                <omgdi:waypoint x="549.95" y="200.0"></omgdi:waypoint>
+                <omgdi:waypoint x="600.0" y="200.0"></omgdi:waypoint>
             </bpmndi:BPMNEdge>
             <bpmndi:BPMNEdge bpmnElement="receiveInfo1ToStoreProcessFinished"
                              id="BPMNEdge_receiveInfo1ToStoreProcessFinished" flowable:sourceDockerX="50.0"
                              flowable:sourceDockerY="30.0" flowable:targetDockerX="50.0" flowable:targetDockerY="30.0">
-                <omgdi:waypoint x="924.9499999999999" y="190.0"></omgdi:waypoint>
-                <omgdi:waypoint x="1010.0" y="190.0"></omgdi:waypoint>
-                <omgdi:waypoint x="1010.0" y="255.0"></omgdi:waypoint>
+                <omgdi:waypoint x="924.9499999999999" y="200.0"></omgdi:waypoint>
+                <omgdi:waypoint x="1010.0" y="200.0"></omgdi:waypoint>
+                <omgdi:waypoint x="1010.0" y="270.0"></omgdi:waypoint>
             </bpmndi:BPMNEdge>
             <bpmndi:BPMNEdge bpmnElement="requestInfo2ToReceiveInfo2" id="BPMNEdge_requestInfo2ToReceiveInfo2"
                              flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="50.0"
                              flowable:targetDockerY="30.0">
-                <omgdi:waypoint x="701.864213562373" y="375.0"></omgdi:waypoint>
-                <omgdi:waypoint x="824.9999999998889" y="375.0"></omgdi:waypoint>
+                <omgdi:waypoint x="731.1571067810702" y="405.0"></omgdi:waypoint>
+                <omgdi:waypoint x="809.9999999998979" y="405.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="catchInfo2ErrorToGenerateCancellationEmail"
+                             id="BPMNEdge_catchInfo2ErrorToGenerateCancellationEmail" flowable:sourceDockerX="15.0"
+                             flowable:sourceDockerY="15.0" flowable:targetDockerX="50.0" flowable:targetDockerY="30.0">
+                <omgdi:waypoint x="645.244397025394" y="443.8315629587831"></omgdi:waypoint>
+                <omgdi:waypoint x="486.5" y="545.0"></omgdi:waypoint>
+                <omgdi:waypoint x="460.391" y="690.0"></omgdi:waypoint>
             </bpmndi:BPMNEdge>
             <bpmndi:BPMNEdge bpmnElement="checkForTeacherToGenerateTeacherInvalidEmail"
                              id="BPMNEdge_checkForTeacherToGenerateTeacherInvalidEmail" flowable:sourceDockerX="20.0"
                              flowable:sourceDockerY="20.0" flowable:targetDockerX="50.0" flowable:targetDockerY="30.0">
-                <omgdi:waypoint x="339.9189252336448" y="110.0"></omgdi:waypoint>
-                <omgdi:waypoint x="352.0" y="110.0"></omgdi:waypoint>
-                <omgdi:waypoint x="352.0" y="30.000000000000007"></omgdi:waypoint>
-                <omgdi:waypoint x="389.99999999999045" y="30.000000000000007"></omgdi:waypoint>
+                <omgdi:waypoint x="369.9339371980647" y="110.0"></omgdi:waypoint>
+                <omgdi:waypoint x="412.0" y="110.0"></omgdi:waypoint>
+                <omgdi:waypoint x="412.0" y="40.00000000000001"></omgdi:waypoint>
+                <omgdi:waypoint x="449.9999999999931" y="40.00000000000001"></omgdi:waypoint>
             </bpmndi:BPMNEdge>
             <bpmndi:BPMNEdge bpmnElement="sendTeacherInvalidEmailToEnd" id="BPMNEdge_sendTeacherInvalidEmailToEnd"
                              flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="14.0"
                              flowable:targetDockerY="14.0">
-                <omgdi:waypoint x="671.1571067811537" y="30.0"></omgdi:waypoint>
-                <omgdi:waypoint x="1124.0" y="30.0"></omgdi:waypoint>
-                <omgdi:waypoint x="1124.0" y="271.0"></omgdi:waypoint>
+                <omgdi:waypoint x="699.9499999999863" y="40.0"></omgdi:waypoint>
+                <omgdi:waypoint x="1139.0" y="40.0"></omgdi:waypoint>
+                <omgdi:waypoint x="1139.0" y="286.0"></omgdi:waypoint>
             </bpmndi:BPMNEdge>
             <bpmndi:BPMNEdge bpmnElement="storeProcessFinishedToEnd" id="BPMNEdge_storeProcessFinishedToEnd"
                              flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="14.0"
                              flowable:targetDockerY="14.0">
-                <omgdi:waypoint x="1059.949999999996" y="285.0"></omgdi:waypoint>
-                <omgdi:waypoint x="1110.0" y="285.0"></omgdi:waypoint>
+                <omgdi:waypoint x="1059.95" y="300.0"></omgdi:waypoint>
+                <omgdi:waypoint x="1125.0" y="300.0"></omgdi:waypoint>
             </bpmndi:BPMNEdge>
             <bpmndi:BPMNEdge bpmnElement="startToLoadTeacherEmail" id="BPMNEdge_startToLoadTeacherEmail"
                              flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="50.0"
@@ -331,59 +429,75 @@
                 <omgdi:waypoint x="64.94999918773193" y="110.0"></omgdi:waypoint>
                 <omgdi:waypoint x="150.0" y="110.0"></omgdi:waypoint>
             </bpmndi:BPMNEdge>
-            <bpmndi:BPMNEdge bpmnElement="StoreProcessStartToRequestInfo1" id="BPMNEdge_StoreProcessStartToRequestInfo1"
+            <bpmndi:BPMNEdge bpmnElement="processCancellationToGenerateCancellationEmail"
+                             id="BPMNEdge_processCancellationToGenerateCancellationEmail" flowable:sourceDockerX="50.0"
+                             flowable:sourceDockerY="30.0" flowable:targetDockerX="50.0" flowable:targetDockerY="30.0">
+                <omgdi:waypoint x="504.95000000000005" y="720.0"></omgdi:waypoint>
+                <omgdi:waypoint x="580.0" y="720.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="generateCancellationEmailToSendCancellationEmail"
+                             id="BPMNEdge_generateCancellationEmailToSendCancellationEmail"
                              flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="50.0"
                              flowable:targetDockerY="30.0">
-                <omgdi:waypoint x="489.95000000000005" y="190.0"></omgdi:waypoint>
-                <omgdi:waypoint x="571.2071067811866" y="190.0"></omgdi:waypoint>
+                <omgdi:waypoint x="679.9499999999999" y="720.0"></omgdi:waypoint>
+                <omgdi:waypoint x="750.0" y="720.0"></omgdi:waypoint>
             </bpmndi:BPMNEdge>
             <bpmndi:BPMNEdge bpmnElement="checkForTeacherToRequestInfo1" id="BPMNEdge_checkForTeacherToRequestInfo1"
                              flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="50.0"
                              flowable:targetDockerY="30.0">
-                <omgdi:waypoint x="339.9189252336448" y="110.0"></omgdi:waypoint>
-                <omgdi:waypoint x="352.0" y="110.0"></omgdi:waypoint>
-                <omgdi:waypoint x="352.0" y="190.0"></omgdi:waypoint>
-                <omgdi:waypoint x="390.0" y="190.0"></omgdi:waypoint>
+                <omgdi:waypoint x="369.9339371980647" y="110.0"></omgdi:waypoint>
+                <omgdi:waypoint x="412.0" y="110.0"></omgdi:waypoint>
+                <omgdi:waypoint x="412.0" y="200.0"></omgdi:waypoint>
+                <omgdi:waypoint x="450.0" y="200.0"></omgdi:waypoint>
             </bpmndi:BPMNEdge>
             <bpmndi:BPMNEdge bpmnElement="receiveInfo2ToStoreProcessFinished"
                              id="BPMNEdge_receiveInfo2ToStoreProcessFinished" flowable:sourceDockerX="50.0"
                              flowable:sourceDockerY="30.0" flowable:targetDockerX="50.0" flowable:targetDockerY="30.0">
-                <omgdi:waypoint x="924.9499999999999" y="375.0"></omgdi:waypoint>
-                <omgdi:waypoint x="1010.0" y="375.0"></omgdi:waypoint>
-                <omgdi:waypoint x="1010.0" y="314.95"></omgdi:waypoint>
+                <omgdi:waypoint x="909.9499999997022" y="405.0"></omgdi:waypoint>
+                <omgdi:waypoint x="1010.0" y="405.0"></omgdi:waypoint>
+                <omgdi:waypoint x="1010.0" y="329.95"></omgdi:waypoint>
             </bpmndi:BPMNEdge>
             <bpmndi:BPMNEdge bpmnElement="loadTeacherEmailToCheckForTeacher"
                              id="BPMNEdge_loadTeacherEmailToCheckForTeacher" flowable:sourceDockerX="50.0"
                              flowable:sourceDockerY="30.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
-                <omgdi:waypoint x="249.9499999999898" y="110.0"></omgdi:waypoint>
-                <omgdi:waypoint x="300.0" y="110.0"></omgdi:waypoint>
+                <omgdi:waypoint x="249.94999999997228" y="110.0"></omgdi:waypoint>
+                <omgdi:waypoint x="330.0" y="110.0"></omgdi:waypoint>
             </bpmndi:BPMNEdge>
             <bpmndi:BPMNEdge bpmnElement="requestInfo1ToReceiveInfo1" id="BPMNEdge_requestInfo1ToReceiveInfo1"
                              flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="50.0"
                              flowable:targetDockerY="30.0">
-                <omgdi:waypoint x="671.1571067811865" y="190.0"></omgdi:waypoint>
-                <omgdi:waypoint x="825.0" y="190.0"></omgdi:waypoint>
+                <omgdi:waypoint x="699.9499999999999" y="200.0"></omgdi:waypoint>
+                <omgdi:waypoint x="825.0" y="200.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="sendCancellationEmailToEnd" id="BPMNEdge_sendCancellationEmailToEnd"
+                             flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="14.0"
+                             flowable:targetDockerY="14.0">
+                <omgdi:waypoint x="849.9499999999999" y="720.0"></omgdi:waypoint>
+                <omgdi:waypoint x="1139.0" y="720.0"></omgdi:waypoint>
+                <omgdi:waypoint x="1139.0" y="313.94991800354575"></omgdi:waypoint>
             </bpmndi:BPMNEdge>
             <bpmndi:BPMNEdge bpmnElement="sendTeacherInformationTimeoutEmailToEnd"
                              id="BPMNEdge_sendTeacherInformationTimeoutEmailToEnd" flowable:sourceDockerX="50.0"
                              flowable:sourceDockerY="30.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
-                <omgdi:waypoint x="924.9499999999999" y="525.0"></omgdi:waypoint>
-                <omgdi:waypoint x="1124.0" y="525.0"></omgdi:waypoint>
-                <omgdi:waypoint x="1124.0" y="298.9499221612399"></omgdi:waypoint>
+                <omgdi:waypoint x="909.9499999999999" y="555.0"></omgdi:waypoint>
+                <omgdi:waypoint x="996.5" y="555.0"></omgdi:waypoint>
+                <omgdi:waypoint x="1132.1692751120522" y="312.17974742255575"></omgdi:waypoint>
             </bpmndi:BPMNEdge>
             <bpmndi:BPMNEdge bpmnElement="generateTeacherInvalidEmailToSendTeacherInvalidEmail"
                              id="BPMNEdge_generateTeacherInvalidEmailToSendTeacherInvalidEmail"
                              flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="50.0"
                              flowable:targetDockerY="30.0">
-                <omgdi:waypoint x="489.95000000000005" y="30.0"></omgdi:waypoint>
-                <omgdi:waypoint x="571.2071067811866" y="30.0"></omgdi:waypoint>
+                <omgdi:waypoint x="549.949999999998" y="40.0"></omgdi:waypoint>
+                <omgdi:waypoint x="562.0" y="40.0"></omgdi:waypoint>
+                <omgdi:waypoint x="562.0" y="40.00000000000001"></omgdi:waypoint>
+                <omgdi:waypoint x="599.9999999999931" y="40.00000000000001"></omgdi:waypoint>
             </bpmndi:BPMNEdge>
             <bpmndi:BPMNEdge bpmnElement="requestInfo2TimeoutToGenerateTeacherInformationTimeoutEmail"
                              id="BPMNEdge_requestInfo2TimeoutToGenerateTeacherInformationTimeoutEmail"
                              flowable:sourceDockerX="15.500000000000002" flowable:sourceDockerY="15.500000000000002"
                              flowable:targetDockerX="50.0" flowable:targetDockerY="30.0">
-                <omgdi:waypoint x="682.6213203435597" y="421.1571054542987"></omgdi:waypoint>
-                <omgdi:waypoint x="682.6213203435597" y="495.0"></omgdi:waypoint>
+                <omgdi:waypoint x="711.9142135623731" y="451.1571054542999"></omgdi:waypoint>
+                <omgdi:waypoint x="711.9142135623731" y="525.0"></omgdi:waypoint>
             </bpmndi:BPMNEdge>
         </bpmndi:BPMNPlane>
     </bpmndi:BPMNDiagram>

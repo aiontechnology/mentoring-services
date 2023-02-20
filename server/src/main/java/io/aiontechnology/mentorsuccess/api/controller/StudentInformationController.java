@@ -31,13 +31,16 @@ import io.aiontechnology.mentorsuccess.service.StudentRegistrationService;
 import io.aiontechnology.mentorsuccess.service.StudentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -80,6 +83,17 @@ public class StudentInformationController {
         return studentRegistrationService.findStudentInformationWorkflowById(registrationId)
                 .flatMap(s -> studentInformationAssembler.mapWithData(s, data))
                 .orElseThrow(() -> new NotFoundException("Student information was not found"));
+    }
+
+    @DeleteMapping("/{registrationId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void handleCancellation(@PathVariable("schoolId") UUID schoolId, @PathVariable("studentId") UUID studentId,
+            @PathVariable("registrationId") UUID registrationId) {
+        schoolService.getSchoolById(schoolId)
+                .orElseThrow(() -> new NotFoundException("School was not found"));
+        studentService.getStudentById(studentId)
+                .orElseThrow(() -> new NotFoundException("Student was not found"));
+        studentRegistrationService.cancelRegistration(registrationId);
     }
 
     @PostMapping

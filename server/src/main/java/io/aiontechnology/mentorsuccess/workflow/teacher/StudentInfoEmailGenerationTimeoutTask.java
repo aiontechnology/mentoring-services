@@ -40,7 +40,7 @@ public class StudentInfoEmailGenerationTimeoutTask extends EmailGeneratorSupport
 
     @Override
     protected String getFrom(DelegateExecution execution) {
-        return "do-not-reply@mentorsuccesskids.com";
+        return DEFAULT_FROM_EMAIL_ADDRESS;
     }
 
     @Override

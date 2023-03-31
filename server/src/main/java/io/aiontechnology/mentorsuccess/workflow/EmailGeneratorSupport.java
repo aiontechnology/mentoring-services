@@ -25,6 +25,8 @@ import static io.aiontechnology.mentorsuccess.workflow.RegistrationWorkflowConst
 
 public abstract class EmailGeneratorSupport implements JavaDelegate {
 
+    protected static final String DEFAULT_FROM_EMAIL_ADDRESS = "do-not-reply@mentorsuccesskids.com";
+
     @Override
     public final void execute(DelegateExecution execution) {
         execution.setTransientVariable(EMAIL, createEmailConfiguration(execution));

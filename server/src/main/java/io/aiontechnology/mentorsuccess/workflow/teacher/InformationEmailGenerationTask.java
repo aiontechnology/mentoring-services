@@ -50,7 +50,8 @@ public class InformationEmailGenerationTask extends EmailGeneratorSupport {
 
     @Override
     protected String getFrom(DelegateExecution execution) {
-        return taskUtilities.getProgramAdminEmail(execution);
+//        return taskUtilities.getProgramAdminEmail(execution);
+        return DEFAULT_FROM_EMAIL_ADDRESS;
     }
 
     @Override

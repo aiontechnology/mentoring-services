@@ -47,7 +47,7 @@ public class StudentInformationCompleteEmailGenerationTask extends EmailGenerato
 
     @Override
     protected String getFrom(DelegateExecution execution) {
-        return "do-not-reply@mentorsuccesskids.com";
+        return DEFAULT_FROM_EMAIL_ADDRESS;
     }
 
     @Override

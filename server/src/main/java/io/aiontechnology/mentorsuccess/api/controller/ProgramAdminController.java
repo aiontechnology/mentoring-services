@@ -105,25 +105,20 @@ public class ProgramAdminController {
     }
 
     /**
-     * A REST endpoint for getting all program admins for a specific school.
+     * A REST endpoint to deactivate a specific program admin for particular school.
      *
-     * @param schoolId The id of the desired program admin.
-     * @return A collection of {@link InboundProgramAdmin} instances.
+     * @param schoolId The id of the school.
+     * @param programAdminId The id of the program admin.
      */
-    @GetMapping
-    @PreAuthorize("hasAuthority('program-admins:read')")
-    public CollectionModel<ProgramAdminResource> getProgramAdmins(@PathVariable("schoolId") UUID schoolId) {
-        log.debug("Getting all program admins for school {}", schoolId);
-        Session session = entityManager.unwrap(Session.class);
-        session.enableFilter("roleType").setParameter("type", PROGRAM_ADMIN.toString());
-        return schoolService.getSchoolById(schoolId)
-                .map(school -> school.getRoles().stream()
-                        .map(programAdminAssembler::map)
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
-                        .collect(Collectors.toList()))
-                .map(programAdmins -> CollectionModel.of(programAdmins))
-                .orElseThrow(() -> new NotFoundException("Requested school not found"));
+    @DeleteMapping("/{programAdminId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasAuthority('program-admin:delete')")
+    public void deactivatePersonnel(@PathVariable("schoolId") UUID schoolId,
+            @PathVariable("programAdminId") UUID programAdminId) {
+        log.debug("Deactivating personnel");
+        roleService.findRoleById(programAdminId)
+                .map(awsService::removeAwsUser)
+                .ifPresent(roleService::deactivateRole);
     }
 
     /**
@@ -139,6 +134,27 @@ public class ProgramAdminController {
             @PathVariable("programAdminId") UUID programAdminId) {
         return roleService.findRoleById(programAdminId)
                 .flatMap(programAdminAssembler::map)
+                .orElseThrow(() -> new NotFoundException("Requested school not found"));
+    }
+
+    /**
+     * A REST endpoint for getting all program admins for a specific school.
+     *
+     * @param schoolId The id of the desired program admin.
+     * @return A collection of {@link InboundProgramAdmin} instances.
+     */
+    @GetMapping
+    public CollectionModel<ProgramAdminResource> getProgramAdmins(@PathVariable("schoolId") UUID schoolId) {
+        log.debug("Getting all program admins for school {}", schoolId);
+        Session session = entityManager.unwrap(Session.class);
+        session.enableFilter("roleType").setParameter("type", PROGRAM_ADMIN.toString());
+        return schoolService.getSchoolById(schoolId)
+                .map(school -> school.getRoles().stream()
+                        .map(programAdminAssembler::map)
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .collect(Collectors.toList()))
+                .map(programAdmins -> CollectionModel.of(programAdmins))
                 .orElseThrow(() -> new NotFoundException("Requested school not found"));
     }
 
@@ -161,23 +177,6 @@ public class ProgramAdminController {
                 .map(roleService::updateRole)
                 .flatMap(programAdminAssembler::map)
                 .orElseThrow(() -> new IllegalArgumentException("Unable to update personnel"));
-    }
-
-    /**
-     * A REST endpoint to deactivate a specific program admin for particular school.
-     *
-     * @param schoolId The id of the school.
-     * @param programAdminId The id of the program admin.
-     */
-    @DeleteMapping("/{programAdminId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasAuthority('program-admin:delete')")
-    public void deactivatePersonnel(@PathVariable("schoolId") UUID schoolId,
-            @PathVariable("programAdminId") UUID programAdminId) {
-        log.debug("Deactivating personnel");
-        roleService.findRoleById(programAdminId)
-                .map(awsService::removeAwsUser)
-                .ifPresent(roleService::deactivateRole);
     }
 
 }

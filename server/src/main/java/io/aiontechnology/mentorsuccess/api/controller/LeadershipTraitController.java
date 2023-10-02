@@ -54,7 +54,6 @@ public class LeadershipTraitController {
      * @return A collection of leadership trait strings.
      */
     @GetMapping
-    @PreAuthorize("hasAuthority('resource:read')")
     public CollectionModel<String> getLeadershipTraits() {
         var leadershipTraitModels =
                 StreamSupport.stream(leadershipTraitService.getAllLeadershipTraits().spliterator(), false)

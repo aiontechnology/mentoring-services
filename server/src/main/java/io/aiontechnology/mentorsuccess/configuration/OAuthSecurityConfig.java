@@ -49,16 +49,6 @@ public class OAuthSecurityConfig extends WebSecurityConfigurerAdapter {
     @Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri}")
     String jwkSetUri;
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-                .authorizeRequests(authorize -> authorize
-                        .anyRequest().authenticated())
-                .oauth2ResourceServer(oAuth2ResourceServerCustomizer ->
-                        oAuth2ResourceServerCustomizer.jwt(jwtCustomizer -> jwtCustomizer.decoder(jwtDecoder())))
-                .addFilterAfter(new AuthoritiesGrantingFilter(), BasicAuthenticationFilter.class);
-    }
-
     @Bean
     public JwtDecoder jwtDecoder() {
         NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build();
@@ -68,7 +58,24 @@ public class OAuthSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web -> web.ignoring().antMatchers("/api/v1/schools/*/registrations/**"));
+        return (web -> web
+                .ignoring()
+                .antMatchers("/api/v1/schools/*/registrations/**")
+                .antMatchers("/api/v1/schools/*/students/*/registrations/*")
+                .antMatchers("/api/v1/schools/*/programAdmins")
+                .antMatchers("/api/v1/behaviors")
+                .antMatchers("/api/v1/leadership_skills")
+                .antMatchers("/api/v1/leadership_traits"));
+    }
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+                .authorizeRequests(authorize -> authorize
+                        .anyRequest().authenticated())
+                .oauth2ResourceServer(oAuth2ResourceServerCustomizer ->
+                        oAuth2ResourceServerCustomizer.jwt(jwtCustomizer -> jwtCustomizer.decoder(jwtDecoder())))
+                .addFilterAfter(new AuthoritiesGrantingFilter(), BasicAuthenticationFilter.class);
     }
 
 }

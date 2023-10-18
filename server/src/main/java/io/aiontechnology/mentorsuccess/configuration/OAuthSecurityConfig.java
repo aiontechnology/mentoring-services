@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Aion Technology LLC
+ * Copyright 2021-2023 Aion Technology LLC
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -22,19 +22,23 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+
+import static org.springframework.http.HttpMethod.GET;
 
 /**
  * @author Whitney Hunter
  * @since 0.8.0
  */
+@Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(
         securedEnabled = true,
@@ -42,7 +46,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
         jsr250Enabled = true)
 @Slf4j
 @RequiredArgsConstructor
-public class OAuthSecurityConfig extends WebSecurityConfigurerAdapter {
+public class OAuthSecurityConfig {
 
     private final CognitoClaimConverterService cognitoClaimConverterService;
 
@@ -58,24 +62,23 @@ public class OAuthSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web -> web
-                .ignoring()
+        return web -> web.ignoring()
                 .antMatchers("/api/v1/schools/*/registrations/**")
                 .antMatchers("/api/v1/schools/*/students/*/registrations/*")
-                .antMatchers("/api/v1/schools/*/programAdmins")
+                .antMatchers(GET, "/api/v1/schools/*/programAdmins")
                 .antMatchers("/api/v1/behaviors")
                 .antMatchers("/api/v1/leadership_skills")
-                .antMatchers("/api/v1/leadership_traits"));
+                .antMatchers("/api/v1/leadership_traits");
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeRequests(authorize -> authorize
-                        .anyRequest().authenticated())
+                .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
                 .oauth2ResourceServer(oAuth2ResourceServerCustomizer ->
                         oAuth2ResourceServerCustomizer.jwt(jwtCustomizer -> jwtCustomizer.decoder(jwtDecoder())))
                 .addFilterAfter(new AuthoritiesGrantingFilter(), BasicAuthenticationFilter.class);
+        return http.build();
     }
 
 }

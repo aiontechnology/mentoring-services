@@ -32,8 +32,6 @@ import static io.aiontechnology.mentorsuccess.workflow.RegistrationWorkflowConst
 @RequiredArgsConstructor
 public class InvitationEmailGenerationCancellationTask extends EmailGeneratorSupport {
 
-    private final RegistrationCancellationEmailGenerator emailGenerator;
-
     private final TaskUtilities taskUtilities;
 
     @Override
@@ -41,7 +39,8 @@ public class InvitationEmailGenerationCancellationTask extends EmailGeneratorSup
         String programAdminName = taskUtilities.getProgramAdminFullName(execution);
         InboundInvitation invitation = taskUtilities.getRequiredVariable(execution, INVITATION,
                 InboundInvitation.class);
-        return emailGenerator.render(programAdminName, invitation);
+        return getGenerationStrategy(execution, RegistrationCancellationEmailGenerator.class)
+                .render(programAdminName, invitation);
     }
 
     @Override

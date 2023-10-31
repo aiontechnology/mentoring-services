@@ -60,8 +60,6 @@ import static io.aiontechnology.mentorsuccess.workflow.RegistrationWorkflowConst
 @RequiredArgsConstructor
 public class InvitationEmailGenerationTask extends EmailGeneratorSupport {
 
-    private final StudentInvitationEmailGenerator emailGenerator;
-
     private final TaskUtilities taskUtilities;
 
     @Override
@@ -73,13 +71,13 @@ public class InvitationEmailGenerationTask extends EmailGeneratorSupport {
         String programAdminEmail = taskUtilities.getProgramAdminEmail(execution);
         String programAdminPhone = taskUtilities.getProgramAdminEmail(execution);
         String registrationUri = createRegistrationUri(execution, school, invitation);
-        return emailGenerator.render(invitation.getParent1FirstName(), school.getName(), programAdminName,
-                programAdminEmail, programAdminPhone, registrationUri);
+        return getGenerationStrategy(execution, StudentInvitationEmailGenerator.class)
+                .render(invitation.getParent1FirstName(), school.getName(), programAdminName, programAdminEmail,
+                        programAdminPhone, registrationUri);
     }
 
     @Override
     protected String getFrom(DelegateExecution execution) {
-//        return taskUtilities.getProgramAdminEmail(execution);
         return DEFAULT_FROM_EMAIL_ADDRESS;
     }
 

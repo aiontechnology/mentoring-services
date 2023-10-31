@@ -61,6 +61,10 @@
                 Generate an email that will be sent to the program administrator to notify him/her that a student has
                 been registered into the program by a parent.
             </documentation>
+            <extensionElements>
+                <flowable:field name="generationStrategyClassName"
+                                expression="${generationStrategyClassName}"/>
+            </extensionElements>
         </serviceTask>
 
         <serviceTask id="sendRegistrationCompleteEmail"

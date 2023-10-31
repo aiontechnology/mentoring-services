@@ -21,6 +21,7 @@ import io.aiontechnology.mentorsuccess.entity.School;
 import io.aiontechnology.mentorsuccess.entity.SchoolPersonRole;
 import io.aiontechnology.mentorsuccess.entity.Student;
 import io.aiontechnology.mentorsuccess.model.enumeration.RoleType;
+import io.aiontechnology.mentorsuccess.model.inbound.student.InboundStudentAssessment;
 import io.aiontechnology.mentorsuccess.model.inbound.student.InboundStudentInformation;
 import io.aiontechnology.mentorsuccess.service.SchoolService;
 import io.aiontechnology.mentorsuccess.service.StudentService;
@@ -34,6 +35,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static io.aiontechnology.mentorsuccess.feature.workflow.WorkflowKeys.STUDENT_ASSESSMENT;
 import static io.aiontechnology.mentorsuccess.model.enumeration.RoleType.PROGRAM_ADMIN;
 import static io.aiontechnology.mentorsuccess.model.enumeration.RoleType.TEACHER;
 import static io.aiontechnology.mentorsuccess.workflow.RegistrationWorkflowConstants.SCHOOL_ID;
@@ -48,6 +50,10 @@ public class TaskUtilities {
     // Services
     private final SchoolService schoolService;
     private final StudentService studentService;
+
+    public Optional<InboundStudentAssessment> getInboundStudentAssessment(DelegateExecution execution) {
+        return Optional.ofNullable(execution.getVariable(STUDENT_ASSESSMENT, InboundStudentAssessment.class));
+    }
 
     public Optional<InboundStudentInformation> getInboundStudentInformation(DelegateExecution execution) {
         return Optional.ofNullable(execution.getVariable(STUDENT_INFORMATION, InboundStudentInformation.class));
@@ -73,6 +79,12 @@ public class TaskUtilities {
         return value;
     }
 
+    /**
+     * Retrieve the {@link School} based on the SCHOOL_ID that is contained in a process variable.
+     *
+     * @param execution The execution object from which process variables are retrieved.
+     * @return The {@link School} if it could be located.
+     */
     public Optional<School> getSchool(DelegateExecution execution) {
         UUID schoolId = UUID.fromString(getRequiredVariable(execution, SCHOOL_ID, String.class));
         return schoolService.getSchoolById(schoolId);

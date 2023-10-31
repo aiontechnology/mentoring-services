@@ -1,0 +1,201 @@
+<!--
+  ~ Copyright 2023 Aion Technology LLC
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+    <style>
+        img {
+            width: 75%;
+            height: auto;
+        }
+
+        table {
+            border-collapse: collapse;
+        }
+
+        td, th {
+            border: black 1px solid;
+            text-align: left;
+            padding: 10px 20px;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <img src="https://mentorsuccess-public.s3.us-west-2.amazonaws.com/email-logo.png"/>
+    <p>
+        Dear ${programAdminName},
+    </p>
+    <p>
+        A post assessment has been completed for <b>${studentName}</b>.
+    </p>
+    <table>
+        <thead>
+        <tr>
+            <th>Property</th>
+            <th>Value</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Can easily and accurately describe her special strengths and positive qualities</td>
+            <td>${postAssessment.question1}</td>
+        </tr>
+        <tr>
+            <td>Is proud and confident in her abilities; enjoys being herself</td>
+            <td>${postAssessment.question2}</td>
+        </tr>
+        <tr>
+            <td>Focuses mostly on her strengths instead of weaknesses and past failures</td>
+            <td>${postAssessment.question3}</td>
+        </tr>
+        <tr>
+            <td>Speaks mostly positively about herself, rarely negatively</td>
+            <td>${postAssessment.question4}</td>
+        </tr>
+        <tr>
+            <td>Has a few developed hobbies and interests that encourage natural strengths</td>
+            <td>${postAssessment.question5}</td>
+        </tr>
+        <tr>
+            <td>Shows sensitivity toward the needs and feelings of others</td>
+            <td>${postAssessment.question6}</td>
+        </tr>
+        <tr>
+            <td>Recognizes when someone is distressed and responds appropriately</td>
+            <td>${postAssessment.question7}</td>
+        </tr>
+        <tr>
+            <td>Shows a willingness to understand someone else's point of view</td>
+            <td>${postAssessment.question8}</td>
+        </tr>
+        <tr>
+            <td>Displays concern and wants to help when someone is treated unfairly or unkindly</td>
+            <td>${postAssessment.question9}</td>
+        </tr>
+        <tr>
+            <td>Tears up or is upset when someone else is suffering</td>
+            <td>${postAssessment.question10}</td>
+        </tr>
+        <tr>
+            <td>Is honest, admits mistakes, and accepts blame for incorrect actions</td>
+            <td>${postAssessment.question11}</td>
+        </tr>
+        <tr>
+            <td>Can identify his wrong behavior and turn a wrong action into a right one</td>
+            <td>${postAssessment.question12}</td>
+        </tr>
+        <tr>
+            <td>Feels guilt about his wrong or improper actions</td>
+            <td>${postAssessment.question13}</td>
+        </tr>
+        <tr>
+            <td>Rarely needs admonishment/reminders as to how to act right</td>
+            <td>${postAssessment.question14}</td>
+        </tr>
+        <tr>
+            <td>Can be trusted to do the right thing and keep his word even when no one is looking</td>
+            <td>${postAssessment.question15}</td>
+        </tr>
+        <tr>
+            <td>Able to manage her own impulses and urges without adult help</td>
+            <td>${postAssessment.question16}</td>
+        </tr>
+        <tr>
+            <td>Easily calms down and bounces back when excited, frustrated, or angry</td>
+            <td>${postAssessment.question17}</td>
+        </tr>
+        <tr>
+            <td>Can identify his unhealthy emotions and stress signs prior to their escalating</td>
+            <td>${postAssessment.question18}</td>
+        </tr>
+        <tr>
+            <td>Has the ability to wait for something; can cope with behavioral impulses</td>
+            <td>${postAssessment.question19}</td>
+        </tr>
+        <tr>
+            <td>Can remain focused on age-appropriate tasks without adult prompts</td>
+            <td>${postAssessment.question20}</td>
+        </tr>
+        <tr>
+            <td>Asks copious why-type questions that don't always have yes/no answers</td>
+            <td>${postAssessment.question21}</td>
+        </tr>
+        <tr>
+            <td>Enjoys finding new ways to use conventional things or solving problems</td>
+            <td>${postAssessment.question22}</td>
+        </tr>
+        <tr>
+            <td>Loves learning new things that drive her interest</td>
+            <td>${postAssessment.question23}</td>
+        </tr>
+        <tr>
+            <td>Intrigued or easy to motivate about trying something new, different, or surprising</td>
+            <td>${postAssessment.question24}</td>
+        </tr>
+        <tr>
+            <td>Willing to be wrong and try a different, unconventional way</td>
+            <td>${postAssessment.question25}</td>
+        </tr>
+        <tr>
+            <td>Willingly tries new tasks with little concern about failing or making a mistake</td>
+            <td>${postAssessment.question26}</td>
+        </tr>
+        <tr>
+            <td>Recognizes that the way to improve is by working harder</td>
+            <td>${postAssessment.question27}</td>
+        </tr>
+        <tr>
+            <td>Does not become upset when something is difficult; rarely quits but keeps trying</td>
+            <td>${postAssessment.question28}</td>
+        </tr>
+        <tr>
+            <td>Willing to try again if not successful with a task</td>
+            <td>${postAssessment.question29}</td>
+        </tr>
+        <tr>
+            <td>Doesn't equate a mistake as a personal failure but a learning opportunity</td>
+            <td>${postAssessment.question30}</td>
+        </tr>
+        <tr>
+            <td>Expresses gratitude, is appreciative, and takes stock of the good things around her</td>
+            <td>${postAssessment.question31}</td>
+        </tr>
+        <tr>
+            <td>Uses positive self-talk to express hope and reinforce good outcomes and attitudes</td>
+            <td>${postAssessment.question32}</td>
+        </tr>
+        <tr>
+            <td>Doesn't blame but forgives; knows something she can do to make things better</td>
+            <td>${postAssessment.question33}</td>
+        </tr>
+        <tr>
+            <td>Can find the silver lining in a hardship or challenge</td>
+            <td>${postAssessment.question34}</td>
+        </tr>
+        <tr>
+            <td>Equates setbacks and failures as temporary, not permanent</td>
+            <td>${postAssessment.question35}</td>
+        </tr>
+        </tbody>
+    </table>
+    <p>
+        Thank you,<br/>
+        MentorSuccess™
+    </p>
+</div>
+</body>
+</html>

@@ -32,8 +32,6 @@ import static io.aiontechnology.mentorsuccess.workflow.RegistrationWorkflowConst
 @RequiredArgsConstructor
 public class StudentInformationCompleteEmailGenerationTask extends EmailGeneratorSupport {
 
-    private final TeacherInvitationCompleteEmailGenerator emailGenerator;
-
     private final TaskUtilities taskUtilities;
 
     @Override
@@ -42,7 +40,8 @@ public class StudentInformationCompleteEmailGenerationTask extends EmailGenerato
         String studentName = taskUtilities.getStudentFullName(execution).orElse("");
         InboundStudentInformation studentInformation =
                 taskUtilities.getInboundStudentInformation(execution).orElseThrow();
-        return emailGenerator.render(programAdminName, studentName, studentInformation);
+        return getGenerationStrategy(execution, TeacherInvitationCompleteEmailGenerator.class)
+                .render(programAdminName, studentName, studentInformation);
     }
 
     @Override

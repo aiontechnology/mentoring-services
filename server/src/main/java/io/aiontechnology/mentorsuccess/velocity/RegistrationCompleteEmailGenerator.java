@@ -19,11 +19,9 @@ package io.aiontechnology.mentorsuccess.velocity;
 import io.aiontechnology.mentorsuccess.model.inbound.student.InboundStudentRegistration;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
-import org.springframework.stereotype.Service;
 
 import java.io.StringWriter;
 
-@Service
 public class RegistrationCompleteEmailGenerator extends VelocityGenerationStrategySupport {
 
     private static final String TEMPLATE_NAME = "templates/student/registration-complete-email.vm";

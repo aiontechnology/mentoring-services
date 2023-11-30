@@ -1,0 +1,28 @@
+name: mentorsuccess-services
+id: 'ari:cloud:compass:791acea2-71ce-4f0a-a604-d8eec9f1541d:component/ba332265-3f57-40d7-9444-bd8d39d0d410/2db8e16d-607a-47d5-b305-6d3d34776972'
+description: REST services for the MentorSuccess application
+configVersion: 1
+typeId: SERVICE
+ownerId: 'ari:cloud:teams::team/87b27333-73f3-46ed-bfa4-58cbf20dcd8f'
+fields:
+  lifecycle: Active
+  tier: 4
+links:
+  - name: Bitbucket Repository
+    type: REPOSITORY
+    url: 'https://bitbucket.org/hisheartfoundation/mentorsuccess-services'
+  - name: Jira Project
+    type: PROJECT
+    url: 'https://aiontechnology.atlassian.net/jira/software/projects/MS/boards/5/backlog'
+  - name: Confluence Documentation
+    type: DOCUMENT
+    url: 'https://aiontechnology.atlassian.net/wiki/spaces/MS/overview'
+relationships:
+  DEPENDS_ON:
+    - 'ari:cloud:compass:791acea2-71ce-4f0a-a604-d8eec9f1541d:component/ba332265-3f57-40d7-9444-bd8d39d0d410/03d46d4d-af98-4d77-90bb-686c3de3278f'
+labels:
+  - 'language:java'
+customFields: null
+
+# Learn more about formatting compass.yml:
+# https://go.atlassian.com/compass-yml-format

@@ -19,11 +19,9 @@ package io.aiontechnology.mentorsuccess.velocity;
 import io.aiontechnology.mentorsuccess.model.inbound.InboundInvitation;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
-import org.springframework.stereotype.Service;
 
 import java.io.StringWriter;
 
-@Service
 public class RegistrationCancellationEmailGenerator extends VelocityGenerationStrategySupport {
 
     private static final String TEMPLATE_NAME = "templates/student/invitation-cancelled-email.vm";

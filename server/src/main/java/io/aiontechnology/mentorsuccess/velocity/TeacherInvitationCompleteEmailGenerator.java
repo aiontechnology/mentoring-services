@@ -17,20 +17,14 @@
 package io.aiontechnology.mentorsuccess.velocity;
 
 import io.aiontechnology.mentorsuccess.model.inbound.student.InboundStudentInformation;
-import io.aiontechnology.mentorsuccess.repository.PersonRepository;
-import lombok.RequiredArgsConstructor;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
-import org.springframework.stereotype.Service;
 
 import java.io.StringWriter;
 
-@Service
-@RequiredArgsConstructor
 public class TeacherInvitationCompleteEmailGenerator extends VelocityGenerationStrategySupport {
 
     private static final String TEMPLATE_NAME = "templates/teacher/information-request-complete-email.vm";
-    private final PersonRepository personRepository;
 
     public String render(String programAdminName, String studentName, InboundStudentInformation studentInformation) {
         VelocityContext context = createContext(programAdminName, studentName, studentInformation);

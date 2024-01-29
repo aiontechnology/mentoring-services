@@ -30,8 +30,6 @@ import static io.aiontechnology.mentorsuccess.workflow.RegistrationWorkflowConst
 @RequiredArgsConstructor
 public class InvitationEmailGenerationTimeoutTask extends EmailGeneratorSupport {
 
-    private final RegistrationTimeoutEmailGenerator emailGenerator;
-
     private final TaskUtilities taskUtilities;
 
     @Override
@@ -39,7 +37,8 @@ public class InvitationEmailGenerationTimeoutTask extends EmailGeneratorSupport 
         String programAdminName = taskUtilities.getProgramAdminFullName(execution);
         InboundInvitation invitation = taskUtilities.getRequiredVariable(execution, INVITATION,
                 InboundInvitation.class);
-        return emailGenerator.render(programAdminName, invitation);
+        return getGenerationStrategy(execution, RegistrationTimeoutEmailGenerator.class)
+                .render(programAdminName, invitation);
     }
 
     @Override

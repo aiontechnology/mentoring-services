@@ -16,6 +16,8 @@
 
 package io.aiontechnology.mentorsuccess.workflow;
 
+import io.aiontechnology.mentorsuccess.velocity.VelocityGenerationStrategy;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 
@@ -27,6 +29,8 @@ public abstract class EmailGeneratorSupport implements JavaDelegate {
 
     protected static final String DEFAULT_FROM_EMAIL_ADDRESS = "do-not-reply@mentorsuccesskids.com";
 
+    private Expression generationStrategyClassName;
+
     @Override
     public final void execute(DelegateExecution execution) {
         execution.setTransientVariable(EMAIL, createEmailConfiguration(execution));
@@ -36,6 +40,17 @@ public abstract class EmailGeneratorSupport implements JavaDelegate {
     protected abstract String getBody(DelegateExecution execution);
 
     protected abstract String getFrom(DelegateExecution execution);
+
+    protected <T extends VelocityGenerationStrategy> T getGenerationStrategy(DelegateExecution execution, Class<T> clazz) {
+        String name = (String) generationStrategyClassName.getValue(execution);
+        try {
+            Class generationClass = Class.forName(name);
+            return clazz.cast(generationClass.getDeclaredConstructor().newInstance());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     protected abstract String getSubject(DelegateExecution execution);
 

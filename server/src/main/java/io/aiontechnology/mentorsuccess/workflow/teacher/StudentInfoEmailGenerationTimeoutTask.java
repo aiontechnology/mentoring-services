@@ -28,14 +28,14 @@ import org.springframework.stereotype.Service;
 public class StudentInfoEmailGenerationTimeoutTask extends EmailGeneratorSupport {
 
     private final TaskUtilities taskUtilities;
-    private final StudentInfoTimeoutEmailGenerator studentInfoTimeoutEmailGenerator;
 
     @Override
     protected String getBody(DelegateExecution execution) {
         String programAdminName = taskUtilities.getProgramAdminFullName(execution);
         String teacherName = taskUtilities.getTeacherFullName(execution).orElseThrow();
         String studentName = taskUtilities.getStudentFullName(execution).orElseThrow();
-        return studentInfoTimeoutEmailGenerator.render(programAdminName, teacherName, studentName);
+        return getGenerationStrategy(execution, StudentInfoTimeoutEmailGenerator.class)
+                .render(programAdminName, teacherName, studentName);
     }
 
     @Override

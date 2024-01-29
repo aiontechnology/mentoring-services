@@ -27,14 +27,14 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class StudentInfoEmailGenerationTeacherInvalidTask extends EmailGeneratorSupport {
 
-    private final TeacherInvalidEmailGenerator emailGenerator;
     private final TaskUtilities taskUtilities;
 
     @Override
     protected String getBody(DelegateExecution execution) {
         String programAdminName = taskUtilities.getProgramAdminFullName(execution);
         String studentName = taskUtilities.getStudentFullName(execution).orElseThrow();
-        return emailGenerator.render(programAdminName, studentName);
+        return getGenerationStrategy(execution, TeacherInvalidEmailGenerator.class)
+                .render(programAdminName, studentName);
     }
 
     @Override

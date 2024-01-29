@@ -16,16 +16,12 @@
 
 package io.aiontechnology.mentorsuccess.velocity;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
-import org.springframework.stereotype.Service;
 
 import java.io.StringWriter;
 
-@Service
-@RequiredArgsConstructor
-public class TeacherInvalidEmailGenerator {
+public class TeacherInvalidEmailGenerator extends VelocityGenerationStrategySupport {
 
     private static final String TEMPLATE_NAME = "templates/teacher/invalid-teacher-email.vm";
 

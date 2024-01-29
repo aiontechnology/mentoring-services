@@ -68,143 +68,143 @@
         </tr>
         <tr>
             <td>Can easily and accurately describe her special strengths and positive qualities</td>
-            <td>${studentInformation.question1}</td>
+            <td>${studentInformation.studentAssessment.question1}</td>
         </tr>
         <tr>
             <td>Is proud and confident in her abilities; enjoys being herself</td>
-            <td>${studentInformation.question2}</td>
+            <td>${studentInformation.studentAssessment.question2}</td>
         </tr>
         <tr>
             <td>Focuses mostly on her strengths instead of weaknesses and past failures</td>
-            <td>${studentInformation.question3}</td>
+            <td>${studentInformation.studentAssessment.question3}</td>
         </tr>
         <tr>
             <td>Speaks mostly positively about herself, rarely negatively</td>
-            <td>${studentInformation.question4}</td>
+            <td>${studentInformation.studentAssessment.question4}</td>
         </tr>
         <tr>
             <td>Has a few developed hobbies and interests that encourage natural strengths</td>
-            <td>${studentInformation.question5}</td>
+            <td>${studentInformation.studentAssessment.question5}</td>
         </tr>
         <tr>
             <td>Shows sensitivity toward the needs and feelings of others</td>
-            <td>${studentInformation.question6}</td>
+            <td>${studentInformation.studentAssessment.question6}</td>
         </tr>
         <tr>
             <td>Recognizes when someone is distressed and responds appropriately</td>
-            <td>${studentInformation.question7}</td>
+            <td>${studentInformation.studentAssessment.question7}</td>
         </tr>
         <tr>
             <td>Shows a willingness to understand someone else's point of view</td>
-            <td>${studentInformation.question8}</td>
+            <td>${studentInformation.studentAssessment.question8}</td>
         </tr>
         <tr>
             <td>Displays concern and wants to help when someone is treated unfairly or unkindly</td>
-            <td>${studentInformation.question9}</td>
+            <td>${studentInformation.studentAssessment.question9}</td>
         </tr>
         <tr>
             <td>Tears up or is upset when someone else is suffering</td>
-            <td>${studentInformation.question10}</td>
+            <td>${studentInformation.studentAssessment.question10}</td>
         </tr>
         <tr>
             <td>Is honest, admits mistakes, and accepts blame for incorrect actions</td>
-            <td>${studentInformation.question11}</td>
+            <td>${studentInformation.studentAssessment.question11}</td>
         </tr>
         <tr>
             <td>Can identify his wrong behavior and turn a wrong action into a right one</td>
-            <td>${studentInformation.question12}</td>
+            <td>${studentInformation.studentAssessment.question12}</td>
         </tr>
         <tr>
             <td>Feels guilt about his wrong or improper actions</td>
-            <td>${studentInformation.question13}</td>
+            <td>${studentInformation.studentAssessment.question13}</td>
         </tr>
         <tr>
             <td>Rarely needs admonishment/reminders as to how to act right</td>
-            <td>${studentInformation.question14}</td>
+            <td>${studentInformation.studentAssessment.question14}</td>
         </tr>
         <tr>
             <td>Can be trusted to do the right thing and keep his word even when no one is looking</td>
-            <td>${studentInformation.question15}</td>
+            <td>${studentInformation.studentAssessment.question15}</td>
         </tr>
         <tr>
             <td>Able to manage her own impulses and urges without adult help</td>
-            <td>${studentInformation.question16}</td>
+            <td>${studentInformation.studentAssessment.question16}</td>
         </tr>
         <tr>
             <td>Easily calms down and bounces back when excited, frustrated, or angry</td>
-            <td>${studentInformation.question17}</td>
+            <td>${studentInformation.studentAssessment.question17}</td>
         </tr>
         <tr>
             <td>Can identify his unhealthy emotions and stress signs prior to their escalating</td>
-            <td>${studentInformation.question18}</td>
+            <td>${studentInformation.studentAssessment.question18}</td>
         </tr>
         <tr>
             <td>Has the ability to wait for something; can cope with behavioral impulses</td>
-            <td>${studentInformation.question19}</td>
+            <td>${studentInformation.studentAssessment.question19}</td>
         </tr>
         <tr>
             <td>Can remain focused on age-appropriate tasks without adult prompts</td>
-            <td>${studentInformation.question20}</td>
+            <td>${studentInformation.studentAssessment.question20}</td>
         </tr>
         <tr>
             <td>Asks copious why-type questions that don't always have yes/no answers</td>
-            <td>${studentInformation.question21}</td>
+            <td>${studentInformation.studentAssessment.question21}</td>
         </tr>
         <tr>
             <td>Enjoys finding new ways to use conventional things or solving problems</td>
-            <td>${studentInformation.question22}</td>
+            <td>${studentInformation.studentAssessment.question22}</td>
         </tr>
         <tr>
             <td>Loves learning new things that drive her interest</td>
-            <td>${studentInformation.question23}</td>
+            <td>${studentInformation.studentAssessment.question23}</td>
         </tr>
         <tr>
             <td>Intrigued or easy to motivate about trying something new, different, or surprising</td>
-            <td>${studentInformation.question24}</td>
+            <td>${studentInformation.studentAssessment.question24}</td>
         </tr>
         <tr>
             <td>Willing to be wrong and try a different, unconventional way</td>
-            <td>${studentInformation.question25}</td>
+            <td>${studentInformation.studentAssessment.question25}</td>
         </tr>
         <tr>
             <td>Willingly tries new tasks with little concern about failing or making a mistake</td>
-            <td>${studentInformation.question26}</td>
+            <td>${studentInformation.studentAssessment.question26}</td>
         </tr>
         <tr>
             <td>Recognizes that the way to improve is by working harder</td>
-            <td>${studentInformation.question27}</td>
+            <td>${studentInformation.studentAssessment.question27}</td>
         </tr>
         <tr>
             <td>Does not become upset when something is difficult; rarely quits but keeps trying</td>
-            <td>${studentInformation.question28}</td>
+            <td>${studentInformation.studentAssessment.question28}</td>
         </tr>
         <tr>
             <td>Willing to try again if not successful with a task</td>
-            <td>${studentInformation.question29}</td>
+            <td>${studentInformation.studentAssessment.question29}</td>
         </tr>
         <tr>
             <td>Doesn't equate a mistake as a personal failure but a learning opportunity</td>
-            <td>${studentInformation.question30}</td>
+            <td>${studentInformation.studentAssessment.question30}</td>
         </tr>
         <tr>
             <td>Expresses gratitude, is appreciative, and takes stock of the good things around her</td>
-            <td>${studentInformation.question31}</td>
+            <td>${studentInformation.studentAssessment.question31}</td>
         </tr>
         <tr>
             <td>Uses positive self-talk to express hope and reinforce good outcomes and attitudes</td>
-            <td>${studentInformation.question32}</td>
+            <td>${studentInformation.studentAssessment.question32}</td>
         </tr>
         <tr>
             <td>Doesn't blame but forgives; knows something she can do to make things better</td>
-            <td>${studentInformation.question33}</td>
+            <td>${studentInformation.studentAssessment.question33}</td>
         </tr>
         <tr>
             <td>Can find the silver lining in a hardship or challenge</td>
-            <td>${studentInformation.question34}</td>
+            <td>${studentInformation.studentAssessment.question34}</td>
         </tr>
         <tr>
             <td>Equates setbacks and failures as temporary, not permanent</td>
-            <td>${studentInformation.question35}</td>
+            <td>${studentInformation.studentAssessment.question35}</td>
         </tr>
         </tbody>
     </table>

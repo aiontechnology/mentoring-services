@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Aion Technology LLC
+ * Copyright 2022-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,13 @@
 package io.aiontechnology.mentorsuccess.model.inbound.student;
 
 import io.aiontechnology.mentorsuccess.model.inbound.BaseValidatorTest;
+import jakarta.validation.ConstraintViolation;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import javax.validation.ConstraintViolation;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
@@ -36,6 +36,35 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 1.8.0
  */
 public class InboundStudentLeadershipTraitTest extends BaseValidatorTest {
+
+    private static Stream<Pair<InboundStudentLeadershipTrait, String>> leadershipTraitInstanceProvider() {
+        Set<String> leadershipTraits = new HashSet<>();
+        leadershipTraits.add("TRAIT");
+        InboundStudentLeadershipTrait nullLeadershipTraits = InboundStudentLeadershipTrait.builder()
+                .withLeadershipTraits(null)
+                .withTeacher(URI.create("http://test.com"))
+                .build();
+        InboundStudentLeadershipTrait nullTeacher = InboundStudentLeadershipTrait.builder()
+                .withLeadershipTraits(leadershipTraits)
+                .withTeacher(null)
+                .build();
+        return Stream.of(ImmutablePair.of(nullLeadershipTraits, "{studentleadershiptrait.leadershiptrait.notNull}"),
+                ImmutablePair.of(nullTeacher, "{studentleadershiptrait.teacher.notNull}"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("leadershipTraitInstanceProvider")
+    void testInvalid(Pair<InboundStudentLeadershipTrait, String> leadershipTraitInstance) {
+        // set up the fixture
+
+        // execute the SUT
+        Set<ConstraintViolation<InboundStudentLeadershipTrait>> constraintViolations =
+                getValidator().validate(leadershipTraitInstance.getLeft());
+
+        // validation
+        assertThat(constraintViolations.size()).isEqualTo(1);
+        assertThat(constraintViolations.iterator().next().getMessage()).isEqualTo(leadershipTraitInstance.getRight());
+    }
 
     @Test
     void testValid() {
@@ -53,35 +82,6 @@ public class InboundStudentLeadershipTraitTest extends BaseValidatorTest {
 
         // validation
         assertThat(constraintViolations.size()).isEqualTo(0);
-    }
-
-    @ParameterizedTest
-    @MethodSource("leadershipTraitInstanceProvider")
-    void testInvalid(Pair<InboundStudentLeadershipTrait, String> leadershipTraitInstance) {
-        // set up the fixture
-
-        // execute the SUT
-        Set<ConstraintViolation<InboundStudentLeadershipTrait>> constraintViolations =
-                getValidator().validate(leadershipTraitInstance.getLeft());
-
-        // validation
-        assertThat(constraintViolations.size()).isEqualTo(1);
-        assertThat(constraintViolations.iterator().next().getMessage()).isEqualTo(leadershipTraitInstance.getRight());
-    }
-
-    private static Stream<Pair<InboundStudentLeadershipTrait, String>> leadershipTraitInstanceProvider() {
-        Set<String> leadershipTraits = new HashSet<>();
-        leadershipTraits.add("TRAIT");
-        InboundStudentLeadershipTrait nullLeadershipTraits = InboundStudentLeadershipTrait.builder()
-                .withLeadershipTraits(null)
-                .withTeacher(URI.create("http://test.com"))
-                .build();
-        InboundStudentLeadershipTrait nullTeacher = InboundStudentLeadershipTrait.builder()
-                .withLeadershipTraits(leadershipTraits)
-                .withTeacher(null)
-                .build();
-        return Stream.of(ImmutablePair.of(nullLeadershipTraits, "{studentleadershiptrait.leadershiptrait.notNull}"),
-                ImmutablePair.of(nullTeacher, "{studentleadershiptrait.teacher.notNull}"));
     }
 
 }

@@ -1,11 +1,11 @@
 /*
- * Copyright 2020-2022 Aion Technology LLC
+ * Copyright 2020-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,6 +27,8 @@ import io.aiontechnology.mentorsuccess.model.outbound.OutboundMentor;
 import io.aiontechnology.mentorsuccess.resource.MentorResource;
 import io.aiontechnology.mentorsuccess.service.RoleService;
 import io.aiontechnology.mentorsuccess.service.SchoolService;
+import jakarta.persistence.EntityManager;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
@@ -43,8 +45,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.persistence.EntityManager;
-import javax.validation.Valid;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -105,6 +105,36 @@ public class MentorController {
     }
 
     /**
+     * A REST endpoint for deactivating a teacher.
+     *
+     * @param studentId The school from which the teacher should be deactivated.
+     * @param mentorId The id of the mentor to remove.
+     */
+    @DeleteMapping("/{mentorId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasAuthority('mentor:delete')")
+    public void deactivateMentor(@PathVariable("schoolId") UUID studentId, @PathVariable("mentorId") UUID mentorId) {
+        log.debug("Deactivating mentor");
+        roleService.findRoleById(mentorId)
+                .ifPresent(roleService::deactivateRole);
+    }
+
+    /**
+     * A REST endpoint for getting a specific mentor for a particular school.
+     *
+     * @param schoolId The id of the school.
+     * @param mentorId The id of the teacher.
+     * @return The personnel if it could be found.
+     */
+    @GetMapping("/{mentorId}")
+    @PreAuthorize("hasAuthority('mentor:read')")
+    public MentorResource getMentor(@PathVariable("schoolId") UUID schoolId, @PathVariable("mentorId") UUID mentorId) {
+        return roleService.findRoleById(mentorId)
+                .flatMap(mentorAssembler::map)
+                .orElseThrow(() -> new NotFoundException("Requested school not found"));
+    }
+
+    /**
      * A REST endpoint for retrieving all mentors.
      *
      * @param schoolId The id of the school.
@@ -128,21 +158,6 @@ public class MentorController {
     }
 
     /**
-     * A REST endpoint for getting a specific mentor for a particular school.
-     *
-     * @param schoolId The id of the school.
-     * @param mentorId The id of the teacher.
-     * @return The personnel if it could be found.
-     */
-    @GetMapping("/{mentorId}")
-    @PreAuthorize("hasAuthority('mentor:read')")
-    public MentorResource getMentor(@PathVariable("schoolId") UUID schoolId, @PathVariable("mentorId") UUID mentorId) {
-        return roleService.findRoleById(mentorId)
-                .flatMap(mentorAssembler::map)
-                .orElseThrow(() -> new NotFoundException("Requested school not found"));
-    }
-
-    /**
      * A REST endpoint for updating a mentor.
      *
      * @param schoolId The id of the school.
@@ -160,21 +175,6 @@ public class MentorController {
                 .map(roleService::updateRole)
                 .flatMap(mentorAssembler::map)
                 .orElseThrow(() -> new IllegalArgumentException("Unable to update mentor"));
-    }
-
-    /**
-     * A REST endpoint for deactivating a teacher.
-     *
-     * @param studentId The school from which the teacher should be deactivated.
-     * @param mentorId The id of the mentor to remove.
-     */
-    @DeleteMapping("/{mentorId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasAuthority('mentor:delete')")
-    public void deactivateMentor(@PathVariable("schoolId") UUID studentId, @PathVariable("mentorId") UUID mentorId) {
-        log.debug("Deactivating mentor");
-        roleService.findRoleById(mentorId)
-                .ifPresent(roleService::deactivateRole);
     }
 
 }

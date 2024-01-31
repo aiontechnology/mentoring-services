@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Aion Technology LLC
+ * Copyright 2022-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,13 @@
 
 package io.aiontechnology.mentorsuccess.model.inbound;
 
+import jakarta.validation.ConstraintViolation;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import javax.validation.ConstraintViolation;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -33,37 +33,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 1.8.0
  */
 public class InboundProgramAdminTest extends BaseValidatorTest {
-
-    @Test
-    void testValid() {
-        // set up the fixture
-        InboundProgramAdmin inboundProgramAdmin = InboundProgramAdmin.builder()
-                .withFirstName("FIRST")
-                .withLastName("LAST")
-                .withEmail("test@test.com")
-                .build();
-
-        // execute the SUT
-        Set<ConstraintViolation<InboundProgramAdmin>> constraintViolations =
-                getValidator().validate(inboundProgramAdmin);
-
-        // validation
-        assertThat(constraintViolations.size()).isEqualTo(0);
-    }
-
-    @ParameterizedTest
-    @MethodSource("programAdminInstanceProvider")
-    void testInvalid(Pair<InboundProgramAdmin, String> programAdminInstance) {
-        // set up the fixture
-
-        // execute the SUT
-        Set<ConstraintViolation<InboundProgramAdmin>> constraintViolations =
-                getValidator().validate(programAdminInstance.getLeft());
-
-        // validation
-        assertThat(constraintViolations.size()).isEqualTo(1);
-        assertThat(constraintViolations.iterator().next().getMessage()).isEqualTo(programAdminInstance.getRight());
-    }
 
     private static Stream<ImmutablePair<InboundProgramAdmin, String>> programAdminInstanceProvider() {
         InboundProgramAdmin nullFirstName = InboundProgramAdmin.builder()
@@ -108,6 +77,37 @@ public class InboundProgramAdminTest extends BaseValidatorTest {
                 ImmutablePair.of(nullEmail, "{programAdmin.email.notNull}"),
                 ImmutablePair.of(emailTooLong, "{programAdmin.email.size}"),
                 ImmutablePair.of(emailPattern, "{programAdmin.email.invalid}"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("programAdminInstanceProvider")
+    void testInvalid(Pair<InboundProgramAdmin, String> programAdminInstance) {
+        // set up the fixture
+
+        // execute the SUT
+        Set<ConstraintViolation<InboundProgramAdmin>> constraintViolations =
+                getValidator().validate(programAdminInstance.getLeft());
+
+        // validation
+        assertThat(constraintViolations.size()).isEqualTo(1);
+        assertThat(constraintViolations.iterator().next().getMessage()).isEqualTo(programAdminInstance.getRight());
+    }
+
+    @Test
+    void testValid() {
+        // set up the fixture
+        InboundProgramAdmin inboundProgramAdmin = InboundProgramAdmin.builder()
+                .withFirstName("FIRST")
+                .withLastName("LAST")
+                .withEmail("test@test.com")
+                .build();
+
+        // execute the SUT
+        Set<ConstraintViolation<InboundProgramAdmin>> constraintViolations =
+                getValidator().validate(inboundProgramAdmin);
+
+        // validation
+        assertThat(constraintViolations.size()).isEqualTo(0);
     }
 
 }

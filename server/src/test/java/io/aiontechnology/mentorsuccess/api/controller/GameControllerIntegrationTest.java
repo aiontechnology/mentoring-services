@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 Aion Technology LLC
+ * Copyright 2020-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.aiontechnology.mentorsuccess.model.enumeration.ResourceLocation;
 import io.aiontechnology.mentorsuccess.model.inbound.InboundGame;
 import io.aiontechnology.mentorsuccess.security.SystemAdminAuthoritySetter;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,7 +30,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import javax.inject.Inject;
-import javax.transaction.Transactional;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -103,6 +103,38 @@ public class GameControllerIntegrationTest {
     }
 
     @Test
+    void testCreateGame_fieldsInvalid() throws Exception {
+        // setup the fixture
+        InboundGame inboundGame = InboundGame.builder()
+                .withName(
+                        "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901")
+                .withGrade1(7)
+                .withGrade2(7)
+                .withLocation(OFFLINE)
+                .build();
+
+        // execute the SUT
+        ResultActions result = mvc.perform(post("/api/v1/games")
+                .with(jwt().jwt(Jwt.withTokenValue("1234")
+                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
+                        .header("test", "value")
+                        .build()))
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(inboundGame)));
+
+        // validation
+        result.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp", notNullValue()))
+                .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
+                .andExpect(jsonPath("$.error.length()", is(3)))
+                .andExpect(jsonPath("$.error.name", is("The name of a game can not be longer than 100 characters")))
+                .andExpect(jsonPath("$.error.grade1", is("A grade level must be between 1st and 6th")))
+                .andExpect(jsonPath("$.error.grade2", is("A grade level must be between 1st and 6th")))
+                .andExpect(jsonPath("$.message", is("Validation failed")))
+                .andExpect(jsonPath("$.path", is("/api/v1/games")));
+    }
+
+    @Test
     void testCreateGame_nullAllowedFields() throws Exception {
         // setup the fixture
         InboundGame inboundGame = InboundGame.builder()
@@ -165,37 +197,6 @@ public class GameControllerIntegrationTest {
     }
 
     @Test
-    void testCreateGame_fieldsInvalid() throws Exception {
-        // setup the fixture
-        InboundGame inboundGame = InboundGame.builder()
-                .withName("12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901")
-                .withGrade1(7)
-                .withGrade2(7)
-                .withLocation(OFFLINE)
-                .build();
-
-        // execute the SUT
-        ResultActions result = mvc.perform(post("/api/v1/games")
-                .with(jwt().jwt(Jwt.withTokenValue("1234")
-                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
-                        .header("test", "value")
-                        .build()))
-                .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(inboundGame)));
-
-        // validation
-        result.andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.timestamp", notNullValue()))
-                .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
-                .andExpect(jsonPath("$.error.length()", is(3)))
-                .andExpect(jsonPath("$.error.name", is("The name of a game can not be longer than 100 characters")))
-                .andExpect(jsonPath("$.error.grade1", is("A grade level must be between 1st and 6th")))
-                .andExpect(jsonPath("$.error.grade2", is("A grade level must be between 1st and 6th")))
-                .andExpect(jsonPath("$.message", is("Validation failed")))
-                .andExpect(jsonPath("$.path", is("/api/v1/games")));
-    }
-
-    @Test
     void testCreateGame_withRelations() throws Exception {
         // setup the fixture
         Map<String, Object> game = new HashMap<>();
@@ -228,6 +229,22 @@ public class GameControllerIntegrationTest {
                 .andExpect(jsonPath("$.leadershipTraits[0]", is("LEADERSHIP_TRAIT1")))
                 .andExpect(jsonPath("$._links.length()", is(1)))
                 .andExpect(jsonPath("$._links.self[0].href", startsWith("http://localhost/api/v1/games/")));
+    }
+
+    @Test
+    void testDeactivateGame() throws Exception {
+        // setup the fixture
+        // See SQL file
+
+        // execute the SUT
+        ResultActions result = mvc.perform(delete("/api/v1/games/f53af381-d524-40f7-8df9-3e808c9ad46b")
+                .with(jwt().jwt(Jwt.withTokenValue("1234")
+                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
+                        .header("test", "value")
+                        .build())));
+
+        // validation
+        result.andExpect(status().isNoContent());
     }
 
     @Test
@@ -326,22 +343,6 @@ public class GameControllerIntegrationTest {
                 .andExpect(jsonPath("$.leadershipTraits[0]", is("LEADERSHIP_TRAIT2")))
                 .andExpect(jsonPath("$._links.length()", is(1)))
                 .andExpect(jsonPath("$._links.self[0].href", startsWith("http://localhost/api/v1/games/")));
-    }
-
-    @Test
-    void testDeactivateGame() throws Exception {
-        // setup the fixture
-        // See SQL file
-
-        // execute the SUT
-        ResultActions result = mvc.perform(delete("/api/v1/games/f53af381-d524-40f7-8df9-3e808c9ad46b")
-                .with(jwt().jwt(Jwt.withTokenValue("1234")
-                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
-                        .header("test", "value")
-                        .build())));
-
-        // validation
-        result.andExpect(status().isNoContent());
     }
 
 }

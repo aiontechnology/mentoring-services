@@ -1,11 +1,11 @@
 /*
- * Copyright 2020-2021 Aion Technology LLC
+ * Copyright 2020-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,6 +19,7 @@ package io.aiontechnology.mentorsuccess.api.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.aiontechnology.mentorsuccess.model.inbound.InboundTeacher;
 import io.aiontechnology.mentorsuccess.security.SystemAdminAuthoritySetter;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,7 +29,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import javax.inject.Inject;
-import javax.transaction.Transactional;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -105,8 +105,86 @@ public class TeacherControllerIntegrationTest {
                 .andExpect(jsonPath("$.grade1", is(GRADE1)))
                 .andExpect(jsonPath("$.grade2", is(GRADE2)))
                 .andExpect(jsonPath("$._links.length()", is(2)))
-                .andExpect(jsonPath("$._links.self[0].href", startsWith("http://localhost/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers/")))
-                .andExpect(jsonPath("$._links.school[0].href", is("http://localhost/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10")));
+                .andExpect(jsonPath("$._links.self[0].href", startsWith("http://localhost/api/v1/schools/fd03c21f" +
+                        "-cd39-4c05-b3f1-6d49618b6b10/teachers/")))
+                .andExpect(jsonPath("$._links.school[0].href", is("http://localhost/api/v1/schools/fd03c21f-cd39-4c05" +
+                        "-b3f1-6d49618b6b10")));
+    }
+
+    @Test
+    void testCreateTeacher_emailInvalid() throws Exception {
+        // setup the fixture
+        InboundTeacher inboundTeacher = InboundTeacher.builder()
+                .withFirstName(FIRST_NAME)
+                .withLastName(LAST_NAME)
+                .withEmail("invalid")
+                .withWorkPhone(WORK_PHONE)
+                .withCellPhone(CELL_PHONE)
+                .withGrade1(GRADE1)
+                .withGrade2(GRADE2)
+                .build();
+
+        // execute the SUT
+        ResultActions result = mvc.perform(post("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers")
+                .with(jwt().jwt(Jwt.withTokenValue("1234")
+                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
+                        .header("test", "value")
+                        .build()))
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(inboundTeacher)));
+
+        // validation
+        result.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp", notNullValue()))
+                .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
+                .andExpect(jsonPath("$.error.length()", is(1)))
+                .andExpect(jsonPath("$.error.email", is("The provided teacher's email is invalid or longer than 50 " +
+                        "characters")))
+                .andExpect(jsonPath("$.message", is("Validation failed")))
+                .andExpect(jsonPath("$.path", is("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers")));
+    }
+
+    @Test
+    void testCreateTeacher_fieldsInvalid() throws Exception {
+        // setup the fixture
+        InboundTeacher inboundTeacher = InboundTeacher.builder()
+                .withFirstName("123456789012345678901234567890123456789012345678901")
+                .withLastName("123456789012345678901234567890123456789012345678901")
+                .withEmail("123456789012345678901234567890123456789012345678901")
+                .withWorkPhone("12345678901")
+                .withCellPhone("12345678901")
+                .withGrade1(-1)
+                .withGrade2(6)
+                .build();
+
+        // execute the SUT
+        ResultActions result = mvc.perform(post("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers")
+                .with(jwt().jwt(Jwt.withTokenValue("1234")
+                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
+                        .header("test", "value")
+                        .build()))
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(inboundTeacher)));
+
+        // validation
+        result.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp", notNullValue()))
+                .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
+                .andExpect(jsonPath("$.error.length()", is(7)))
+                .andExpect(jsonPath("$.error.firstName", is("A teacher's first name can not be longer than 50 " +
+                        "characters")))
+                .andExpect(jsonPath("$.error.lastName", is("A teacher's last name can not be longer than 50 " +
+                        "characters")))
+                .andExpect(jsonPath("$.error.email", is("The provided teacher's email is invalid or longer than 50 " +
+                        "characters")))
+                .andExpect(jsonPath("$.error.cellPhone", is("The provided teacher's cell phone must be exactly 14 " +
+                        "digits")))
+                .andExpect(jsonPath("$.error.workPhone", is("The provided teacher's work phone must be exactly 14 " +
+                        "digits")))
+                .andExpect(jsonPath("$.error.grade1", is("A teacher's grade must be between kindergarten and 5th")))
+                .andExpect(jsonPath("$.error.grade2", is("A teacher's grade must be between kindergarten and 5th")))
+                .andExpect(jsonPath("$.message", is("Validation failed")))
+                .andExpect(jsonPath("$.path", is("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers")));
     }
 
     @Test
@@ -123,7 +201,7 @@ public class TeacherControllerIntegrationTest {
                 .build();
 
         // execute the SUT
-        ResultActions result = mvc.perform(post("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers/")
+        ResultActions result = mvc.perform(post("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers")
                 .with(jwt().jwt(Jwt.withTokenValue("1234")
                         .claim("cognito:groups", new SystemAdminAuthoritySetter())
                         .header("test", "value")
@@ -140,8 +218,10 @@ public class TeacherControllerIntegrationTest {
                 .andExpect(jsonPath("$.workPhone", nullValue()))
                 .andExpect(jsonPath("$.cellPhone", nullValue()))
                 .andExpect(jsonPath("$._links.length()", is(2)))
-                .andExpect(jsonPath("$._links.self[0].href", startsWith("http://localhost/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers/")))
-                .andExpect(jsonPath("$._links.school[0].href", is("http://localhost/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10")));
+                .andExpect(jsonPath("$._links.self[0].href", startsWith("http://localhost/api/v1/schools/fd03c21f" +
+                        "-cd39-4c05-b3f1-6d49618b6b10/teachers/")))
+                .andExpect(jsonPath("$._links.school[0].href", is("http://localhost/api/v1/schools/fd03c21f-cd39-4c05" +
+                        "-b3f1-6d49618b6b10")));
     }
 
     @Test
@@ -178,73 +258,19 @@ public class TeacherControllerIntegrationTest {
     }
 
     @Test
-    void testCreateTeacher_fieldsInvalid() throws Exception {
+    void testDeactivateTeacher() throws Exception {
         // setup the fixture
-        InboundTeacher inboundTeacher = InboundTeacher.builder()
-                .withFirstName("123456789012345678901234567890123456789012345678901")
-                .withLastName("123456789012345678901234567890123456789012345678901")
-                .withEmail("123456789012345678901234567890123456789012345678901")
-                .withWorkPhone("12345678901")
-                .withCellPhone("12345678901")
-                .withGrade1(-1)
-                .withGrade2(6)
-                .build();
 
         // execute the SUT
-        ResultActions result = mvc.perform(post("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers")
+        ResultActions result = mvc.perform(delete("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers" +
+                "/ca238442-ce51-450d-a474-2e36872abe05")
                 .with(jwt().jwt(Jwt.withTokenValue("1234")
                         .claim("cognito:groups", new SystemAdminAuthoritySetter())
                         .header("test", "value")
-                        .build()))
-                .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(inboundTeacher)));
+                        .build())));
 
         // validation
-        result.andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.timestamp", notNullValue()))
-                .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
-                .andExpect(jsonPath("$.error.length()", is(7)))
-                .andExpect(jsonPath("$.error.firstName", is("A teacher's first name can not be longer than 50 characters")))
-                .andExpect(jsonPath("$.error.lastName", is("A teacher's last name can not be longer than 50 characters")))
-                .andExpect(jsonPath("$.error.email", is("The provided teacher's email is invalid or longer than 50 characters")))
-                .andExpect(jsonPath("$.error.cellPhone", is("The provided teacher's cell phone must be exactly 14 digits")))
-                .andExpect(jsonPath("$.error.workPhone", is("The provided teacher's work phone must be exactly 14 digits")))
-                .andExpect(jsonPath("$.error.grade1", is("A teacher's grade must be between kindergarten and 5th")))
-                .andExpect(jsonPath("$.error.grade2", is("A teacher's grade must be between kindergarten and 5th")))
-                .andExpect(jsonPath("$.message", is("Validation failed")))
-                .andExpect(jsonPath("$.path", is("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers")));
-    }
-
-    @Test
-    void testCreateTeacher_emailInvalid() throws Exception {
-        // setup the fixture
-        InboundTeacher inboundTeacher = InboundTeacher.builder()
-                .withFirstName(FIRST_NAME)
-                .withLastName(LAST_NAME)
-                .withEmail("invalid")
-                .withWorkPhone(WORK_PHONE)
-                .withCellPhone(CELL_PHONE)
-                .withGrade1(GRADE1)
-                .withGrade2(GRADE2)
-                .build();
-
-        // execute the SUT
-        ResultActions result = mvc.perform(post("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers")
-                .with(jwt().jwt(Jwt.withTokenValue("1234")
-                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
-                        .header("test", "value")
-                        .build()))
-                .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(inboundTeacher)));
-
-        // validation
-        result.andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.timestamp", notNullValue()))
-                .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
-                .andExpect(jsonPath("$.error.length()", is(1)))
-                .andExpect(jsonPath("$.error.email", is("The provided teacher's email is invalid or longer than 50 characters")))
-                .andExpect(jsonPath("$.message", is("Validation failed")))
-                .andExpect(jsonPath("$.path", is("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers")));
+        result.andExpect(status().isNoContent());
     }
 
     @Test
@@ -269,7 +295,8 @@ public class TeacherControllerIntegrationTest {
         // See SQL file
 
         // execute the SUT
-        ResultActions result = mvc.perform(get("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers/ba238442-ce51-450d-a474-2e36872abe05")
+        ResultActions result = mvc.perform(get("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers" +
+                "/ba238442-ce51-450d-a474-2e36872abe05")
                 .with(jwt().jwt(Jwt.withTokenValue("1234")
                         .claim("cognito:groups", new SystemAdminAuthoritySetter())
                         .header("test", "value")
@@ -284,8 +311,10 @@ public class TeacherControllerIntegrationTest {
                 .andExpect(jsonPath("$.workPhone", is("(360) 111-2222")))
                 .andExpect(jsonPath("$.cellPhone", is("(360) 333-4444")))
                 .andExpect(jsonPath("$._links.length()", is(2)))
-                .andExpect(jsonPath("$._links.self[0].href", is("http://localhost/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers/ba238442-ce51-450d-a474-2e36872abe05")))
-                .andExpect(jsonPath("$._links.school[0].href", is("http://localhost/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10")));
+                .andExpect(jsonPath("$._links.self[0].href", is("http://localhost/api/v1/schools/fd03c21f-cd39-4c05" +
+                        "-b3f1-6d49618b6b10/teachers/ba238442-ce51-450d-a474-2e36872abe05")))
+                .andExpect(jsonPath("$._links.school[0].href", is("http://localhost/api/v1/schools/fd03c21f-cd39-4c05" +
+                        "-b3f1-6d49618b6b10")));
 
     }
 
@@ -295,7 +324,8 @@ public class TeacherControllerIntegrationTest {
         // None
 
         // execute the SUT
-        ResultActions result = mvc.perform(get("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/Teachers/ca238442-ce51-450d-a474-2e36872abe05")
+        ResultActions result = mvc.perform(get("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/Teachers" +
+                "/ca238442-ce51-450d-a474-2e36872abe05")
                 .with(jwt().jwt(Jwt.withTokenValue("1234")
                         .claim("cognito:groups", new SystemAdminAuthoritySetter())
                         .header("test", "value")
@@ -319,7 +349,8 @@ public class TeacherControllerIntegrationTest {
         teacherModel.put("grade2", "4");
 
         // execute the SUT
-        ResultActions result = mvc.perform(put("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers/ba238442-ce51-450d-a474-2e36872abe05")
+        ResultActions result = mvc.perform(put("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers" +
+                "/ba238442-ce51-450d-a474-2e36872abe05")
                 .with(jwt().jwt(Jwt.withTokenValue("1234")
                         .claim("cognito:groups", new SystemAdminAuthoritySetter())
                         .header("test", "value")
@@ -338,23 +369,10 @@ public class TeacherControllerIntegrationTest {
                 .andExpect(jsonPath("$.grade1", is(5)))
                 .andExpect(jsonPath("$.grade2", is(4)))
                 .andExpect(jsonPath("$._links.length()", is(2)))
-                .andExpect(jsonPath("$._links.self[0].href", startsWith("http://localhost/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers/")))
-                .andExpect(jsonPath("$._links.school[0].href", is("http://localhost/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10")));
-    }
-
-    @Test
-    void testDeactivateTeacher() throws Exception {
-        // setup the fixture
-
-        // execute the SUT
-        ResultActions result = mvc.perform(delete("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers/ca238442-ce51-450d-a474-2e36872abe05")
-                .with(jwt().jwt(Jwt.withTokenValue("1234")
-                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
-                        .header("test", "value")
-                        .build())));
-
-        // validation
-        result.andExpect(status().isNoContent());
+                .andExpect(jsonPath("$._links.self[0].href", startsWith("http://localhost/api/v1/schools/fd03c21f" +
+                        "-cd39-4c05-b3f1-6d49618b6b10/teachers/")))
+                .andExpect(jsonPath("$._links.school[0].href", is("http://localhost/api/v1/schools/fd03c21f-cd39-4c05" +
+                        "-b3f1-6d49618b6b10")));
     }
 
 }

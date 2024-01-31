@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Aion Technology LLC
+ * Copyright 2022-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,13 @@
 package io.aiontechnology.mentorsuccess.model.inbound.student;
 
 import io.aiontechnology.mentorsuccess.model.inbound.BaseValidatorTest;
+import jakarta.validation.ConstraintViolation;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import javax.validation.ConstraintViolation;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -35,38 +35,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 1.8.0
  */
 public class InboundContactTest extends BaseValidatorTest {
-
-    @Test
-    void testValid() {
-        // set up the fixture
-        InboundContact inboundContact = InboundContact.builder()
-                .withFirstName("FIRST")
-                .withLastName("LAST")
-                .withEmail("test@test.com")
-                .withPreferredContactMethod(EITHER)
-                .withIsEmergencyContact(true)
-                .build();
-
-        // execute the SUT
-        Set<ConstraintViolation<InboundContact>> constraintViolations = getValidator().validate(inboundContact);
-
-        // validation
-        assertThat(constraintViolations.size()).isEqualTo(0);
-    }
-
-    @ParameterizedTest
-    @MethodSource("contactInstanceProvider")
-    void testInvalid(Pair<InboundContact, String> contactInstance) {
-        // set up the fixture
-
-        // execute the SUT
-        Set<ConstraintViolation<InboundContact>> constraintViolations =
-                getValidator().validate(contactInstance.getLeft());
-
-        // validation
-        assertThat(constraintViolations.size()).isEqualTo(1);
-        assertThat(constraintViolations.iterator().next().getMessage()).isEqualTo(contactInstance.getRight());
-    }
 
     private static Stream<Pair<InboundContact, String>> contactInstanceProvider() {
         InboundContact labelTooLong = InboundContact.builder()
@@ -139,7 +107,8 @@ public class InboundContactTest extends BaseValidatorTest {
                 .withEmail("test@test.com")
                 .withPreferredContactMethod(EITHER)
                 .withIsEmergencyContact(true)
-                .withComment("1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456") // 256 characters
+                .withComment(
+                        "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456") // 256 characters
                 .build();
         return Stream.of(ImmutablePair.of(labelTooLong, "{contact.label.size}"),
                 ImmutablePair.of(nullFirstName, "{contact.firstName.notNull}"),
@@ -151,6 +120,38 @@ public class InboundContactTest extends BaseValidatorTest {
                 ImmutablePair.of(phonePattern, "{contact.phone.invalid}"),
                 ImmutablePair.of(nullIsEmergencyContact, "{contact.isEmergencyContact.notNull}"),
                 ImmutablePair.of(commentToLong, "{contact.comment.size}"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("contactInstanceProvider")
+    void testInvalid(Pair<InboundContact, String> contactInstance) {
+        // set up the fixture
+
+        // execute the SUT
+        Set<ConstraintViolation<InboundContact>> constraintViolations =
+                getValidator().validate(contactInstance.getLeft());
+
+        // validation
+        assertThat(constraintViolations.size()).isEqualTo(1);
+        assertThat(constraintViolations.iterator().next().getMessage()).isEqualTo(contactInstance.getRight());
+    }
+
+    @Test
+    void testValid() {
+        // set up the fixture
+        InboundContact inboundContact = InboundContact.builder()
+                .withFirstName("FIRST")
+                .withLastName("LAST")
+                .withEmail("test@test.com")
+                .withPreferredContactMethod(EITHER)
+                .withIsEmergencyContact(true)
+                .build();
+
+        // execute the SUT
+        Set<ConstraintViolation<InboundContact>> constraintViolations = getValidator().validate(inboundContact);
+
+        // validation
+        assertThat(constraintViolations.size()).isEqualTo(0);
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2023 Aion Technology LLC
+ * Copyright 2020-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,8 @@
 
 package io.aiontechnology.mentorsuccess.entity.reference;
 
+import jakarta.persistence.Entity;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.Entity;
 
 /**
  * Entity that represents a leadership skill.

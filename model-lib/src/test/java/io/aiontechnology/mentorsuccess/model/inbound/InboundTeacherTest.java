@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Aion Technology LLC
+ * Copyright 2022-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,13 @@
 
 package io.aiontechnology.mentorsuccess.model.inbound;
 
+import jakarta.validation.ConstraintViolation;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import javax.validation.ConstraintViolation;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -33,40 +33,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 1.8.0
  */
 public class InboundTeacherTest extends BaseValidatorTest {
-
-    @Test
-    void testValid() {
-        // set up the fixture
-        InboundTeacher inboundTeacher = InboundTeacher.builder()
-                .withFirstName("FIRST")
-                .withLastName("LAST")
-                .withEmail("test@email.com")
-                .withWorkPhone("(123) 456-7890")
-                .withCellPhone("(123) 456-7890")
-                .withGrade1(1)
-                .withGrade2(2)
-                .build();
-
-        // execute the SUT
-        Set<ConstraintViolation<InboundTeacher>> constraintViolations = getValidator().validate(inboundTeacher);
-
-        // validation
-        assertThat(constraintViolations.size()).isEqualTo(0);
-    }
-
-    @ParameterizedTest
-    @MethodSource("teacherInstanceProvider")
-    void testInvalid(Pair<InboundTeacher, String> teacherInstance) {
-        // set up the fixture
-
-        // execute the SUT
-        Set<ConstraintViolation<InboundTeacher>> constraintViolations =
-                getValidator().validate(teacherInstance.getLeft());
-
-        // validation
-        assertThat(constraintViolations.size()).isEqualTo(1);
-        assertThat(constraintViolations.iterator().next().getMessage()).isEqualTo(teacherInstance.getRight());
-    }
 
     private static Stream<ImmutablePair<InboundTeacher, String>> teacherInstanceProvider() {
         InboundTeacher nullFirstName = InboundTeacher.builder()
@@ -107,6 +73,40 @@ public class InboundTeacherTest extends BaseValidatorTest {
                 ImmutablePair.of(invalidEmail, "{teacher.email.invalid}"),
                 ImmutablePair.of(invalidWorkPhone, "{teacher.workPhone.invalid}"),
                 ImmutablePair.of(invalidCellPhone, "{teacher.cellPhone.invalid}"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("teacherInstanceProvider")
+    void testInvalid(Pair<InboundTeacher, String> teacherInstance) {
+        // set up the fixture
+
+        // execute the SUT
+        Set<ConstraintViolation<InboundTeacher>> constraintViolations =
+                getValidator().validate(teacherInstance.getLeft());
+
+        // validation
+        assertThat(constraintViolations.size()).isEqualTo(1);
+        assertThat(constraintViolations.iterator().next().getMessage()).isEqualTo(teacherInstance.getRight());
+    }
+
+    @Test
+    void testValid() {
+        // set up the fixture
+        InboundTeacher inboundTeacher = InboundTeacher.builder()
+                .withFirstName("FIRST")
+                .withLastName("LAST")
+                .withEmail("test@email.com")
+                .withWorkPhone("(123) 456-7890")
+                .withCellPhone("(123) 456-7890")
+                .withGrade1(1)
+                .withGrade2(2)
+                .build();
+
+        // execute the SUT
+        Set<ConstraintViolation<InboundTeacher>> constraintViolations = getValidator().validate(inboundTeacher);
+
+        // validation
+        assertThat(constraintViolations.size()).isEqualTo(0);
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 Aion Technology LLC
+ * Copyright 2020-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package io.aiontechnology.mentorsuccess.api.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.aiontechnology.mentorsuccess.model.inbound.InboundPerson;
 import io.aiontechnology.mentorsuccess.security.SystemAdminAuthoritySetter;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,7 +29,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import javax.inject.Inject;
-import javax.transaction.Transactional;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -102,6 +102,78 @@ public class PersonControllerIntegrationTest {
     }
 
     @Test
+    void testCreatePerson_emailInvalid() throws Exception {
+        // setup the fixture
+        InboundPerson inboundPerson = InboundPerson.builder()
+                .withId(UUID.randomUUID())
+                .withFirstName(FIRST_NAME)
+                .withLastName(LAST_NAME)
+                .withEmail("invalid")
+                .withWorkPhone(WORK_PHONE)
+                .withCellPhone(CELL_PHONE)
+                .build();
+
+        // execute the SUT
+        ResultActions result = mvc.perform(post("/api/v1/people")
+                .with(jwt().jwt(Jwt.withTokenValue("1234")
+                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
+                        .header("test", "value")
+                        .build()))
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(inboundPerson)));
+
+        // validation
+        result.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp", notNullValue()))
+                .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
+                .andExpect(jsonPath("$.error.length()", is(1)))
+                .andExpect(jsonPath("$.error.email", is("The provided person's email is invalid or longer than 50 " +
+                        "characters")))
+                .andExpect(jsonPath("$.message", is("Validation failed")))
+                .andExpect(jsonPath("$.path", is("/api/v1/people")));
+    }
+
+    @Test
+    void testCreatePerson_fieldsInvalid() throws Exception {
+        // setup the fixture
+        InboundPerson inboundPerson = InboundPerson.builder()
+                .withId(UUID.randomUUID())
+                .withFirstName("123456789012345678901234567890123456789012345678901")
+                .withLastName("123456789012345678901234567890123456789012345678901")
+                .withEmail("123456789012345678901234567890123456789012345678901")
+                .withWorkPhone("12345678901")
+                .withCellPhone("12345678901")
+                .build();
+
+        // execute the SUT
+        ResultActions result = mvc.perform(post("/api/v1/people")
+                .with(jwt().jwt(Jwt.withTokenValue("1234")
+                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
+                        .header("test", "value")
+                        .build()))
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(inboundPerson)));
+
+        // validation
+        result.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp", notNullValue()))
+                .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
+                .andExpect(jsonPath("$.error.length()", is(5)))
+                .andExpect(jsonPath("$.error.firstName", is("A person's first name can not be longer than 50 " +
+                        "characters")))
+                .andExpect(jsonPath("$.error.lastName", is("A person's last name can not be longer than 50 " +
+                        "characters")))
+                .andExpect(jsonPath("$.error.email", is("The provided person's email is invalid or longer than 50 " +
+                        "characters")))
+                .andExpect(jsonPath("$.error.cellPhone", is("The provided person's cell phone must be exactly 14 " +
+                        "digits")))
+                .andExpect(jsonPath("$.error.workPhone", is("The provided person's work phone must be exactly 14 " +
+                        "digits")))
+                .andExpect(jsonPath("$.message", is("Validation failed")))
+                .andExpect(jsonPath("$.path", is("/api/v1/people")));
+    }
+
+    @Test
     void testCreatePerson_nullAllowedFields() throws Exception {
         // setup the fixture
         InboundPerson inboundPerson = InboundPerson.builder()
@@ -168,72 +240,6 @@ public class PersonControllerIntegrationTest {
     }
 
     @Test
-    void testCreatePerson_fieldsInvalid() throws Exception {
-        // setup the fixture
-        InboundPerson inboundPerson = InboundPerson.builder()
-                .withId(UUID.randomUUID())
-                .withFirstName("123456789012345678901234567890123456789012345678901")
-                .withLastName("123456789012345678901234567890123456789012345678901")
-                .withEmail("123456789012345678901234567890123456789012345678901")
-                .withWorkPhone("12345678901")
-                .withCellPhone("12345678901")
-                .build();
-
-        // execute the SUT
-        ResultActions result = mvc.perform(post("/api/v1/people")
-                .with(jwt().jwt(Jwt.withTokenValue("1234")
-                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
-                        .header("test", "value")
-                        .build()))
-                .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(inboundPerson)));
-
-        // validation
-        result.andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.timestamp", notNullValue()))
-                .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
-                .andExpect(jsonPath("$.error.length()", is(5)))
-                .andExpect(jsonPath("$.error.firstName", is("A person's first name can not be longer than 50 characters")))
-                .andExpect(jsonPath("$.error.lastName", is("A person's last name can not be longer than 50 characters")))
-                .andExpect(jsonPath("$.error.email", is("The provided person's email is invalid or longer than 50 characters")))
-                .andExpect(jsonPath("$.error.cellPhone", is("The provided person's cell phone must be exactly 14 digits")))
-                .andExpect(jsonPath("$.error.workPhone", is("The provided person's work phone must be exactly 14 digits")))
-                .andExpect(jsonPath("$.message", is("Validation failed")))
-                .andExpect(jsonPath("$.path", is("/api/v1/people")));
-    }
-
-    @Test
-    void testCreatePerson_emailInvalid() throws Exception {
-        // setup the fixture
-        InboundPerson inboundPerson = InboundPerson.builder()
-                .withId(UUID.randomUUID())
-                .withFirstName(FIRST_NAME)
-                .withLastName(LAST_NAME)
-                .withEmail("invalid")
-                .withWorkPhone(WORK_PHONE)
-                .withCellPhone(CELL_PHONE)
-                .build();
-
-        // execute the SUT
-        ResultActions result = mvc.perform(post("/api/v1/people")
-                .with(jwt().jwt(Jwt.withTokenValue("1234")
-                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
-                        .header("test", "value")
-                        .build()))
-                .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(inboundPerson)));
-
-        // validation
-        result.andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.timestamp", notNullValue()))
-                .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
-                .andExpect(jsonPath("$.error.length()", is(1)))
-                .andExpect(jsonPath("$.error.email", is("The provided person's email is invalid or longer than 50 characters")))
-                .andExpect(jsonPath("$.message", is("Validation failed")))
-                .andExpect(jsonPath("$.path", is("/api/v1/people")));
-    }
-
-    @Test
     void testGetPersonById_found() throws Exception {
         // setup the fixture
         // See SQL file
@@ -256,7 +262,8 @@ public class PersonControllerIntegrationTest {
                 .andExpect(jsonPath("$.workPhone", is("(360) 111-2222")))
                 .andExpect(jsonPath("$.cellPhone", is("(360) 333-4444")))
                 .andExpect(jsonPath("$._links.length()", is(1)))
-                .andExpect(jsonPath("$._links.self[0].href", is("http://localhost/api/v1/people/2f10e8ac-9ad6-4771-a034-ca1d6c387b9b")));
+                .andExpect(jsonPath("$._links.self[0].href", is("http://localhost/api/v1/people/2f10e8ac-9ad6-4771" +
+                        "-a034-ca1d6c387b9b")));
     }
 
     @Test

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2023 Aion Technology LLC
+ * Copyright 2020-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import io.aiontechnology.mentorsuccess.model.inbound.student.InboundStudent;
 import io.aiontechnology.mentorsuccess.model.inbound.student.InboundStudentMentor;
 import io.aiontechnology.mentorsuccess.model.inbound.student.InboundStudentTeacher;
 import io.aiontechnology.mentorsuccess.security.SystemAdminAuthoritySetter;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -34,7 +35,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import javax.inject.Inject;
-import javax.transaction.Transactional;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -202,47 +202,6 @@ public class StudentControllerIntegrationTest {
     }
 
     @Test
-    void testCreateStudent_nullRequiredValues() throws Exception {
-        // setup the fixture
-        InboundStudent studentModel = InboundStudent.builder()
-                .withFirstName(null)
-                .withLastName(null)
-                .withGrade(null)
-                .withLocation(null)
-                .withRegistrationSigned(null)
-                .withMediaReleaseSigned(null)
-                .withTeacher(null)
-                .build();
-
-        // execute the SUT
-        ResultActions result = mvc.perform(post("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")
-                .with(jwt().jwt(Jwt.withTokenValue("1234")
-                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
-                        .header("test", "value")
-                        .build()))
-                .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(studentModel)));
-
-        // validation
-        result.andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.timestamp", notNullValue()))
-                .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
-                .andExpect(jsonPath("$.error.length()", is(7)))
-                .andExpect(jsonPath("$.error.firstName", is("A student must have a first name")))
-                .andExpect(jsonPath("$.error.lastName", is("A student must have a last name")))
-                .andExpect(jsonPath("$.error.grade", is("A student must have a grade")))
-                .andExpect(jsonPath("$.error.location", is("A location is required for a student")))
-                .andExpect(jsonPath("$.error.mediaReleaseSigned", is("A media release specification is required for a" +
-                        " student")))
-                .andExpect(jsonPath("$.error.registrationSigned", is("A parent signature specification is required " +
-                        "for" +
-                        " a student")))
-                .andExpect(jsonPath("$.error.teacher", is("A student's teacher must be provided")))
-                .andExpect(jsonPath("$.message", is("Validation failed")))
-                .andExpect(jsonPath("$.path", is("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")));
-    }
-
-    @Test
     void testCreateStudent_fieldsTooLong() throws Exception {
         // setup the fixture
         final URI TEACHER_URI = URI.create(
@@ -303,48 +262,6 @@ public class StudentControllerIntegrationTest {
     }
 
     @Test
-    void testCreateStudent_nullTeacherValues() throws Exception {
-        // setup the fixture
-        InboundStudentTeacher inboundStudentTeacher = InboundStudentTeacher.builder()
-                .withUri(null)
-                .build();
-
-        String FIRST_NAME = "FIRST_NAME";
-        String LAST_NAME = "LAST_NAME";
-        int GRADE = 1;
-        ResourceLocation LOCATION = ResourceLocation.OFFLINE;
-        Boolean IS_REGISTRATION_SIGNED = true;
-        Boolean IS_MEDIA_RELEASE_SIGNED = true;
-        InboundStudent studentModel = InboundStudent.builder()
-                .withFirstName(FIRST_NAME)
-                .withLastName(LAST_NAME)
-                .withGrade(GRADE)
-                .withLocation(LOCATION)
-                .withRegistrationSigned(IS_REGISTRATION_SIGNED)
-                .withMediaReleaseSigned(IS_MEDIA_RELEASE_SIGNED)
-                .withTeacher(inboundStudentTeacher)
-                .build();
-
-        // execute the SUT
-        ResultActions result = mvc.perform(post("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")
-                .with(jwt().jwt(Jwt.withTokenValue("1234")
-                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
-                        .header("test", "value")
-                        .build()))
-                .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(studentModel)));
-
-        // validation
-        result.andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.timestamp", notNullValue()))
-                .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
-                .andExpect(jsonPath("$.error.length()", is(1)))
-                .andExpect(jsonPath("$.error.['teacher.uri']", is("A URI for a teacher is required")))
-                .andExpect(jsonPath("$.message", is("Validation failed")))
-                .andExpect(jsonPath("$.path", is("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")));
-    }
-
-    @Test
     void testCreateStudent_invalidTeacherUri() throws Exception {
         // setup the fixture
         final URI TEACHER_URI = URI.create(
@@ -386,6 +303,89 @@ public class StudentControllerIntegrationTest {
                 .andExpect(jsonPath("$.error.length()", is(1)))
                 .andExpect(jsonPath("$.error.['Not found']", is("Unable to find specified teacher")))
                 .andExpect(jsonPath("$.message", is("Not found")))
+                .andExpect(jsonPath("$.path", is("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")));
+    }
+
+    @Test
+    void testCreateStudent_nullRequiredValues() throws Exception {
+        // setup the fixture
+        InboundStudent studentModel = InboundStudent.builder()
+                .withFirstName(null)
+                .withLastName(null)
+                .withGrade(null)
+                .withLocation(null)
+                .withRegistrationSigned(null)
+                .withMediaReleaseSigned(null)
+                .withTeacher(null)
+                .build();
+
+        // execute the SUT
+        ResultActions result = mvc.perform(post("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")
+                .with(jwt().jwt(Jwt.withTokenValue("1234")
+                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
+                        .header("test", "value")
+                        .build()))
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(studentModel)));
+
+        // validation
+        result.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp", notNullValue()))
+                .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
+                .andExpect(jsonPath("$.error.length()", is(7)))
+                .andExpect(jsonPath("$.error.firstName", is("A student must have a first name")))
+                .andExpect(jsonPath("$.error.lastName", is("A student must have a last name")))
+                .andExpect(jsonPath("$.error.grade", is("A student must have a grade")))
+                .andExpect(jsonPath("$.error.location", is("A location is required for a student")))
+                .andExpect(jsonPath("$.error.mediaReleaseSigned", is("A media release specification is required for a" +
+                        " student")))
+                .andExpect(jsonPath("$.error.registrationSigned", is("A parent signature specification is required " +
+                        "for" +
+                        " a student")))
+                .andExpect(jsonPath("$.error.teacher", is("A student's teacher must be provided")))
+                .andExpect(jsonPath("$.message", is("Validation failed")))
+                .andExpect(jsonPath("$.path", is("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")));
+    }
+
+    @Test
+    void testCreateStudent_nullTeacherValues() throws Exception {
+        // setup the fixture
+        InboundStudentTeacher inboundStudentTeacher = InboundStudentTeacher.builder()
+                .withUri(null)
+                .build();
+
+        String FIRST_NAME = "FIRST_NAME";
+        String LAST_NAME = "LAST_NAME";
+        int GRADE = 1;
+        ResourceLocation LOCATION = ResourceLocation.OFFLINE;
+        Boolean IS_REGISTRATION_SIGNED = true;
+        Boolean IS_MEDIA_RELEASE_SIGNED = true;
+        InboundStudent studentModel = InboundStudent.builder()
+                .withFirstName(FIRST_NAME)
+                .withLastName(LAST_NAME)
+                .withGrade(GRADE)
+                .withLocation(LOCATION)
+                .withRegistrationSigned(IS_REGISTRATION_SIGNED)
+                .withMediaReleaseSigned(IS_MEDIA_RELEASE_SIGNED)
+                .withTeacher(inboundStudentTeacher)
+                .build();
+
+        // execute the SUT
+        ResultActions result = mvc.perform(post("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")
+                .with(jwt().jwt(Jwt.withTokenValue("1234")
+                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
+                        .header("test", "value")
+                        .build()))
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(studentModel)));
+
+        // validation
+        result.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp", notNullValue()))
+                .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
+                .andExpect(jsonPath("$.error.length()", is(1)))
+                .andExpect(jsonPath("$.error.['teacher.uri']", is("A URI for a teacher is required")))
+                .andExpect(jsonPath("$.message", is("Validation failed")))
                 .andExpect(jsonPath("$.path", is("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")));
     }
 
@@ -434,348 +434,6 @@ public class StudentControllerIntegrationTest {
                 .andExpect(jsonPath("$.behaviors.length()", is(2)))
                 .andExpect(jsonPath("$.behaviors", hasItem("Perfectionism")))
                 .andExpect(jsonPath("$.behaviors", hasItem("Bullying / Tattling")));
-    }
-
-    @Test
-    void testCreateStudent_withInvalidBehavior() throws Exception {
-        // setup the fixture
-        final URI TEACHER_URI = URI.create(
-                "http://localhost/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers/ba238442-ce51-450d" +
-                        "-a474-2e36872abe05");
-        String COMMENT = "COMMENT";
-        InboundStudentTeacher inboundStudentTeacher = InboundStudentTeacher.builder()
-                .withUri(TEACHER_URI)
-                .withComment(COMMENT)
-                .build();
-
-        String FIRST_NAME = "FIRST_NAME";
-        String LAST_NAME = "LAST_NAME";
-        int GRADE = 1;
-        ResourceLocation LOCATION = ResourceLocation.OFFLINE;
-        Date startDate = new Date();
-        Boolean IS_REGISTRATION_SIGNED = true;
-        Boolean IS_MEDIA_RELEASE_SIGNED = true;
-        InboundStudent studentModel = InboundStudent.builder()
-                .withFirstName(FIRST_NAME)
-                .withLastName(LAST_NAME)
-                .withGrade(GRADE)
-                .withLocation(LOCATION)
-                .withStartDate(startDate)
-                .withRegistrationSigned(IS_REGISTRATION_SIGNED)
-                .withMediaReleaseSigned(IS_MEDIA_RELEASE_SIGNED)
-                .withTeacher(inboundStudentTeacher)
-                .withBehaviors(new HashSet<String>(Arrays.asList("INVALID")))
-                .build();
-
-        // execute the SUT
-        ResultActions result = mvc.perform(post("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")
-                .with(jwt().jwt(Jwt.withTokenValue("1234")
-                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
-                        .header("test", "value")
-                        .build()))
-                .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(studentModel)));
-
-        // validation
-        result.andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.timestamp", notNullValue()))
-                .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
-                .andExpect(jsonPath("$.error.length()", is(1)))
-                .andExpect(jsonPath("$.error.['Not found']", is("Invalid behavior: INVALID")))
-                .andExpect(jsonPath("$.message", is("Not found")))
-                .andExpect(jsonPath("$.path", is("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")));
-    }
-
-    @Test
-    void testCreateStudent_withInterests() throws Exception {
-        // setup the fixture
-        final URI TEACHER_URI = URI.create(
-                "http://localhost/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers/ba238442-ce51-450d" +
-                        "-a474-2e36872abe05");
-        String COMMENT = "COMMENT";
-        InboundStudentTeacher inboundStudentTeacher = InboundStudentTeacher.builder()
-                .withUri(TEACHER_URI)
-                .withComment(COMMENT)
-                .build();
-
-        String FIRST_NAME = "FIRST_NAME";
-        String LAST_NAME = "LAST_NAME";
-        int GRADE = 1;
-        ResourceLocation LOCATION = ResourceLocation.OFFLINE;
-        Date startDate = new Date();
-        Boolean IS_REGISTRATION_SIGNED = true;
-        Boolean IS_MEDIA_RELEASE_SIGNED = true;
-        InboundStudent studentModel = InboundStudent.builder()
-                .withFirstName(FIRST_NAME)
-                .withLastName(LAST_NAME)
-                .withGrade(GRADE)
-                .withLocation(LOCATION)
-                .withStartDate(startDate)
-                .withRegistrationSigned(IS_REGISTRATION_SIGNED)
-                .withMediaReleaseSigned(IS_MEDIA_RELEASE_SIGNED)
-                .withTeacher(inboundStudentTeacher)
-                .withInterests(new HashSet(Arrays.asList("Cats", "Dogs")))
-                .build();
-
-        // execute the SUT
-        ResultActions result = mvc.perform(post("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")
-                .with(jwt().jwt(Jwt.withTokenValue("1234")
-                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
-                        .header("test", "value")
-                        .build()))
-                .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(studentModel)));
-
-        // validation
-        result.andExpect(status().isCreated())
-                .andExpect(jsonPath("$.interests.length()", is(2)))
-                .andExpect(jsonPath("$.interests", hasItem("Cats")))
-                .andExpect(jsonPath("$.interests", hasItem("Dogs")));
-    }
-
-    @Test
-    @Disabled("Currently the API will ignore invalid interests")
-    void testCreateStudent_withInvalidInterest() throws Exception {
-        // setup the fixture
-        final URI TEACHER_URI = URI.create(
-                "http://localhost/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers/ba238442-ce51-450d" +
-                        "-a474-2e36872abe05");
-        String COMMENT = "COMMENT";
-        InboundStudentTeacher inboundStudentTeacher = InboundStudentTeacher.builder()
-                .withUri(TEACHER_URI)
-                .withComment(COMMENT)
-                .build();
-
-        String FIRST_NAME = "FIRST_NAME";
-        String LAST_NAME = "LAST_NAME";
-        int GRADE = 1;
-        ResourceLocation LOCATION = ResourceLocation.OFFLINE;
-        Date startDate = new Date();
-        Boolean IS_REGISTRATION_SIGNED = true;
-        Boolean IS_MEDIA_RELEASE_SIGNED = true;
-        InboundStudent studentModel = InboundStudent.builder()
-                .withFirstName(FIRST_NAME)
-                .withLastName(LAST_NAME)
-                .withGrade(GRADE)
-                .withLocation(LOCATION)
-                .withStartDate(startDate)
-                .withRegistrationSigned(IS_REGISTRATION_SIGNED)
-                .withMediaReleaseSigned(IS_MEDIA_RELEASE_SIGNED)
-                .withTeacher(inboundStudentTeacher)
-                .withInterests(new HashSet(Arrays.asList("INVALID")))
-                .build();
-
-        // execute the SUT
-        ResultActions result = mvc.perform(post("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")
-                .with(jwt().jwt(Jwt.withTokenValue("1234")
-                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
-                        .header("test", "value")
-                        .build()))
-                .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(studentModel)));
-
-        // validation
-        result.andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.timestamp", notNullValue()))
-                .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
-                .andExpect(jsonPath("$.error.length()", is(1)))
-                .andExpect(jsonPath("$.error.['Not found']", is("Invalid interest: INVALID")))
-                .andExpect(jsonPath("$.message", is("Not found")))
-                .andExpect(jsonPath("$.path", is("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")));
-    }
-
-    @Test
-    void testCreateStudent_withLeadershipSkills() throws Exception {
-        // setup the fixture
-        final URI TEACHER_URI = URI.create(
-                "http://localhost/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers/ba238442-ce51-450d" +
-                        "-a474-2e36872abe05");
-        String COMMENT = "COMMENT";
-        InboundStudentTeacher inboundStudentTeacher = InboundStudentTeacher.builder()
-                .withUri(TEACHER_URI)
-                .withComment(COMMENT)
-                .build();
-
-        String FIRST_NAME = "FIRST_NAME";
-        String LAST_NAME = "LAST_NAME";
-        int GRADE = 1;
-        ResourceLocation LOCATION = ResourceLocation.OFFLINE;
-        Date startDate = new Date();
-        Boolean IS_REGISTRATION_SIGNED = true;
-        Boolean IS_MEDIA_RELEASE_SIGNED = true;
-        InboundStudent studentModel = InboundStudent.builder()
-                .withFirstName(FIRST_NAME)
-                .withLastName(LAST_NAME)
-                .withGrade(GRADE)
-                .withLocation(LOCATION)
-                .withStartDate(startDate)
-                .withRegistrationSigned(IS_REGISTRATION_SIGNED)
-                .withMediaReleaseSigned(IS_MEDIA_RELEASE_SIGNED)
-                .withTeacher(inboundStudentTeacher)
-                .withLeadershipSkills(new HashSet(Arrays.asList("Decision Making", "Planning")))
-                .build();
-
-        // execute the SUT
-        ResultActions result = mvc.perform(post("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")
-                .with(jwt().jwt(Jwt.withTokenValue("1234")
-                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
-                        .header("test", "value")
-                        .build()))
-                .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(studentModel)));
-
-        // validation
-        result.andExpect(status().isCreated())
-                .andExpect(jsonPath("$.leadershipSkills.length()", is(2)))
-                .andExpect(jsonPath("$.leadershipSkills", hasItem("Decision Making")))
-                .andExpect(jsonPath("$.leadershipSkills", hasItem("Planning")));
-    }
-
-    @Test
-    void testCreateStudent_withInvalidLeadershipSkill() throws Exception {
-        // setup the fixture
-        final URI TEACHER_URI = URI.create(
-                "http://localhost/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers/ba238442-ce51-450d" +
-                        "-a474-2e36872abe05");
-        String COMMENT = "COMMENT";
-        InboundStudentTeacher inboundStudentTeacher = InboundStudentTeacher.builder()
-                .withUri(TEACHER_URI)
-                .withComment(COMMENT)
-                .build();
-
-        String FIRST_NAME = "FIRST_NAME";
-        String LAST_NAME = "LAST_NAME";
-        int GRADE = 1;
-        ResourceLocation LOCATION = ResourceLocation.OFFLINE;
-        Date startDate = new Date();
-        Boolean IS_REGISTRATION_SIGNED = true;
-        Boolean IS_MEDIA_RELEASE_SIGNED = true;
-        InboundStudent studentModel = InboundStudent.builder()
-                .withFirstName(FIRST_NAME)
-                .withLastName(LAST_NAME)
-                .withGrade(GRADE)
-                .withLocation(LOCATION)
-                .withStartDate(startDate)
-                .withRegistrationSigned(IS_REGISTRATION_SIGNED)
-                .withMediaReleaseSigned(IS_MEDIA_RELEASE_SIGNED)
-                .withTeacher(inboundStudentTeacher)
-                .withLeadershipSkills(new HashSet(Arrays.asList("INVALID")))
-                .build();
-
-        // execute the SUT
-        ResultActions result = mvc.perform(post("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")
-                .with(jwt().jwt(Jwt.withTokenValue("1234")
-                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
-                        .header("test", "value")
-                        .build()))
-                .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(studentModel)));
-
-        // validation
-        result.andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.timestamp", notNullValue()))
-                .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
-                .andExpect(jsonPath("$.error.length()", is(1)))
-                .andExpect(jsonPath("$.error.['Not found']", is("Invalid leadership skill: INVALID")))
-                .andExpect(jsonPath("$.message", is("Not found")))
-                .andExpect(jsonPath("$.path", is("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")));
-    }
-
-    @Test
-    void testCreateStudent_withLeadershipTraits() throws Exception {
-        // setup the fixture
-        final URI TEACHER_URI = URI.create(
-                "http://localhost/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers/ba238442-ce51-450d" +
-                        "-a474-2e36872abe05");
-        String COMMENT = "COMMENT";
-        InboundStudentTeacher inboundStudentTeacher = InboundStudentTeacher.builder()
-                .withUri(TEACHER_URI)
-                .withComment(COMMENT)
-                .build();
-
-        String FIRST_NAME = "FIRST_NAME";
-        String LAST_NAME = "LAST_NAME";
-        int GRADE = 1;
-        ResourceLocation LOCATION = ResourceLocation.OFFLINE;
-        Date startDate = new Date();
-        Boolean IS_REGISTRATION_SIGNED = true;
-        Boolean IS_MEDIA_RELEASE_SIGNED = true;
-        InboundStudent studentModel = InboundStudent.builder()
-                .withFirstName(FIRST_NAME)
-                .withLastName(LAST_NAME)
-                .withGrade(GRADE)
-                .withLocation(LOCATION)
-                .withStartDate(startDate)
-                .withRegistrationSigned(IS_REGISTRATION_SIGNED)
-                .withMediaReleaseSigned(IS_MEDIA_RELEASE_SIGNED)
-                .withTeacher(inboundStudentTeacher)
-                .withLeadershipTraits(new HashSet(Arrays.asList("Humility", "Responsibility")))
-                .build();
-
-        // execute the SUT
-        ResultActions result = mvc.perform(post("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")
-                .with(jwt().jwt(Jwt.withTokenValue("1234")
-                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
-                        .header("test", "value")
-                        .build()))
-                .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(studentModel)));
-
-        // validation
-        result.andExpect(status().isCreated())
-                .andExpect(jsonPath("$.leadershipTraits.length()", is(2)))
-                .andExpect(jsonPath("$.leadershipTraits", hasItem("Humility")))
-                .andExpect(jsonPath("$.leadershipTraits", hasItem("Responsibility")));
-    }
-
-    @Test
-    void testCreateStudent_withInvalidLeadershipTrait() throws Exception {
-        // setup the fixture
-        final URI TEACHER_URI = URI.create(
-                "http://localhost/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers/ba238442-ce51-450d" +
-                        "-a474-2e36872abe05");
-        String COMMENT = "COMMENT";
-        InboundStudentTeacher inboundStudentTeacher = InboundStudentTeacher.builder()
-                .withUri(TEACHER_URI)
-                .withComment(COMMENT)
-                .build();
-
-        String FIRST_NAME = "FIRST_NAME";
-        String LAST_NAME = "LAST_NAME";
-        int GRADE = 1;
-        ResourceLocation LOCATION = ResourceLocation.OFFLINE;
-        Date startDate = new Date();
-        Boolean IS_REGISTRATION_SIGNED = true;
-        Boolean IS_MEDIA_RELEASE_SIGNED = true;
-        InboundStudent studentModel = InboundStudent.builder()
-                .withFirstName(FIRST_NAME)
-                .withLastName(LAST_NAME)
-                .withGrade(GRADE)
-                .withLocation(LOCATION)
-                .withStartDate(startDate)
-                .withRegistrationSigned(IS_REGISTRATION_SIGNED)
-                .withMediaReleaseSigned(IS_MEDIA_RELEASE_SIGNED)
-                .withTeacher(inboundStudentTeacher)
-                .withLeadershipTraits(new HashSet(Arrays.asList("INVALID")))
-                .build();
-
-        // execute the SUT
-        ResultActions result = mvc.perform(post("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")
-                .with(jwt().jwt(Jwt.withTokenValue("1234")
-                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
-                        .header("test", "value")
-                        .build()))
-                .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(studentModel)));
-
-        // validation
-        result.andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.timestamp", notNullValue()))
-                .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
-                .andExpect(jsonPath("$.error.length()", is(1)))
-                .andExpect(jsonPath("$.error.['Not found']", is("Invalid leadership trait: INVALID")))
-                .andExpect(jsonPath("$.message", is("Not found")))
-                .andExpect(jsonPath("$.path", is("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")));
     }
 
     @Test
@@ -844,6 +502,103 @@ public class StudentControllerIntegrationTest {
     }
 
     @Test
+    void testCreateStudent_withInterests() throws Exception {
+        // setup the fixture
+        final URI TEACHER_URI = URI.create(
+                "http://localhost/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers/ba238442-ce51-450d" +
+                        "-a474-2e36872abe05");
+        String COMMENT = "COMMENT";
+        InboundStudentTeacher inboundStudentTeacher = InboundStudentTeacher.builder()
+                .withUri(TEACHER_URI)
+                .withComment(COMMENT)
+                .build();
+
+        String FIRST_NAME = "FIRST_NAME";
+        String LAST_NAME = "LAST_NAME";
+        int GRADE = 1;
+        ResourceLocation LOCATION = ResourceLocation.OFFLINE;
+        Date startDate = new Date();
+        Boolean IS_REGISTRATION_SIGNED = true;
+        Boolean IS_MEDIA_RELEASE_SIGNED = true;
+        InboundStudent studentModel = InboundStudent.builder()
+                .withFirstName(FIRST_NAME)
+                .withLastName(LAST_NAME)
+                .withGrade(GRADE)
+                .withLocation(LOCATION)
+                .withStartDate(startDate)
+                .withRegistrationSigned(IS_REGISTRATION_SIGNED)
+                .withMediaReleaseSigned(IS_MEDIA_RELEASE_SIGNED)
+                .withTeacher(inboundStudentTeacher)
+                .withInterests(new HashSet(Arrays.asList("Cats", "Dogs")))
+                .build();
+
+        // execute the SUT
+        ResultActions result = mvc.perform(post("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")
+                .with(jwt().jwt(Jwt.withTokenValue("1234")
+                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
+                        .header("test", "value")
+                        .build()))
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(studentModel)));
+
+        // validation
+        result.andExpect(status().isCreated())
+                .andExpect(jsonPath("$.interests.length()", is(2)))
+                .andExpect(jsonPath("$.interests", hasItem("Cats")))
+                .andExpect(jsonPath("$.interests", hasItem("Dogs")));
+    }
+
+    @Test
+    void testCreateStudent_withInvalidBehavior() throws Exception {
+        // setup the fixture
+        final URI TEACHER_URI = URI.create(
+                "http://localhost/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers/ba238442-ce51-450d" +
+                        "-a474-2e36872abe05");
+        String COMMENT = "COMMENT";
+        InboundStudentTeacher inboundStudentTeacher = InboundStudentTeacher.builder()
+                .withUri(TEACHER_URI)
+                .withComment(COMMENT)
+                .build();
+
+        String FIRST_NAME = "FIRST_NAME";
+        String LAST_NAME = "LAST_NAME";
+        int GRADE = 1;
+        ResourceLocation LOCATION = ResourceLocation.OFFLINE;
+        Date startDate = new Date();
+        Boolean IS_REGISTRATION_SIGNED = true;
+        Boolean IS_MEDIA_RELEASE_SIGNED = true;
+        InboundStudent studentModel = InboundStudent.builder()
+                .withFirstName(FIRST_NAME)
+                .withLastName(LAST_NAME)
+                .withGrade(GRADE)
+                .withLocation(LOCATION)
+                .withStartDate(startDate)
+                .withRegistrationSigned(IS_REGISTRATION_SIGNED)
+                .withMediaReleaseSigned(IS_MEDIA_RELEASE_SIGNED)
+                .withTeacher(inboundStudentTeacher)
+                .withBehaviors(new HashSet<String>(Arrays.asList("INVALID")))
+                .build();
+
+        // execute the SUT
+        ResultActions result = mvc.perform(post("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")
+                .with(jwt().jwt(Jwt.withTokenValue("1234")
+                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
+                        .header("test", "value")
+                        .build()))
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(studentModel)));
+
+        // validation
+        result.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.timestamp", notNullValue()))
+                .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
+                .andExpect(jsonPath("$.error.length()", is(1)))
+                .andExpect(jsonPath("$.error.['Not found']", is("Invalid behavior: INVALID")))
+                .andExpect(jsonPath("$.message", is("Not found")))
+                .andExpect(jsonPath("$.path", is("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")));
+    }
+
+    @Test
     void testCreateStudent_withInvalidContact() throws Exception {
         // setup the fixture
         final URI TEACHER_URI = URI.create(
@@ -901,6 +656,307 @@ public class StudentControllerIntegrationTest {
                         "as an emergency contact or not")))
                 .andExpect(jsonPath("$.message", is("Validation failed")))
                 .andExpect(jsonPath("$.path", is("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")));
+    }
+
+    @Test
+    @Disabled("Currently the API will ignore invalid interests")
+    void testCreateStudent_withInvalidInterest() throws Exception {
+        // setup the fixture
+        final URI TEACHER_URI = URI.create(
+                "http://localhost/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers/ba238442-ce51-450d" +
+                        "-a474-2e36872abe05");
+        String COMMENT = "COMMENT";
+        InboundStudentTeacher inboundStudentTeacher = InboundStudentTeacher.builder()
+                .withUri(TEACHER_URI)
+                .withComment(COMMENT)
+                .build();
+
+        String FIRST_NAME = "FIRST_NAME";
+        String LAST_NAME = "LAST_NAME";
+        int GRADE = 1;
+        ResourceLocation LOCATION = ResourceLocation.OFFLINE;
+        Date startDate = new Date();
+        Boolean IS_REGISTRATION_SIGNED = true;
+        Boolean IS_MEDIA_RELEASE_SIGNED = true;
+        InboundStudent studentModel = InboundStudent.builder()
+                .withFirstName(FIRST_NAME)
+                .withLastName(LAST_NAME)
+                .withGrade(GRADE)
+                .withLocation(LOCATION)
+                .withStartDate(startDate)
+                .withRegistrationSigned(IS_REGISTRATION_SIGNED)
+                .withMediaReleaseSigned(IS_MEDIA_RELEASE_SIGNED)
+                .withTeacher(inboundStudentTeacher)
+                .withInterests(new HashSet(Arrays.asList("INVALID")))
+                .build();
+
+        // execute the SUT
+        ResultActions result = mvc.perform(post("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")
+                .with(jwt().jwt(Jwt.withTokenValue("1234")
+                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
+                        .header("test", "value")
+                        .build()))
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(studentModel)));
+
+        // validation
+        result.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.timestamp", notNullValue()))
+                .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
+                .andExpect(jsonPath("$.error.length()", is(1)))
+                .andExpect(jsonPath("$.error.['Not found']", is("Invalid interest: INVALID")))
+                .andExpect(jsonPath("$.message", is("Not found")))
+                .andExpect(jsonPath("$.path", is("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")));
+    }
+
+    @Test
+    void testCreateStudent_withInvalidLeadershipSkill() throws Exception {
+        // setup the fixture
+        final URI TEACHER_URI = URI.create(
+                "http://localhost/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers/ba238442-ce51-450d" +
+                        "-a474-2e36872abe05");
+        String COMMENT = "COMMENT";
+        InboundStudentTeacher inboundStudentTeacher = InboundStudentTeacher.builder()
+                .withUri(TEACHER_URI)
+                .withComment(COMMENT)
+                .build();
+
+        String FIRST_NAME = "FIRST_NAME";
+        String LAST_NAME = "LAST_NAME";
+        int GRADE = 1;
+        ResourceLocation LOCATION = ResourceLocation.OFFLINE;
+        Date startDate = new Date();
+        Boolean IS_REGISTRATION_SIGNED = true;
+        Boolean IS_MEDIA_RELEASE_SIGNED = true;
+        InboundStudent studentModel = InboundStudent.builder()
+                .withFirstName(FIRST_NAME)
+                .withLastName(LAST_NAME)
+                .withGrade(GRADE)
+                .withLocation(LOCATION)
+                .withStartDate(startDate)
+                .withRegistrationSigned(IS_REGISTRATION_SIGNED)
+                .withMediaReleaseSigned(IS_MEDIA_RELEASE_SIGNED)
+                .withTeacher(inboundStudentTeacher)
+                .withLeadershipSkills(new HashSet(Arrays.asList("INVALID")))
+                .build();
+
+        // execute the SUT
+        ResultActions result = mvc.perform(post("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")
+                .with(jwt().jwt(Jwt.withTokenValue("1234")
+                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
+                        .header("test", "value")
+                        .build()))
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(studentModel)));
+
+        // validation
+        result.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.timestamp", notNullValue()))
+                .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
+                .andExpect(jsonPath("$.error.length()", is(1)))
+                .andExpect(jsonPath("$.error.['Not found']", is("Invalid leadership skill: INVALID")))
+                .andExpect(jsonPath("$.message", is("Not found")))
+                .andExpect(jsonPath("$.path", is("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")));
+    }
+
+    @Test
+    void testCreateStudent_withInvalidLeadershipTrait() throws Exception {
+        // setup the fixture
+        final URI TEACHER_URI = URI.create(
+                "http://localhost/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers/ba238442-ce51-450d" +
+                        "-a474-2e36872abe05");
+        String COMMENT = "COMMENT";
+        InboundStudentTeacher inboundStudentTeacher = InboundStudentTeacher.builder()
+                .withUri(TEACHER_URI)
+                .withComment(COMMENT)
+                .build();
+
+        String FIRST_NAME = "FIRST_NAME";
+        String LAST_NAME = "LAST_NAME";
+        int GRADE = 1;
+        ResourceLocation LOCATION = ResourceLocation.OFFLINE;
+        Date startDate = new Date();
+        Boolean IS_REGISTRATION_SIGNED = true;
+        Boolean IS_MEDIA_RELEASE_SIGNED = true;
+        InboundStudent studentModel = InboundStudent.builder()
+                .withFirstName(FIRST_NAME)
+                .withLastName(LAST_NAME)
+                .withGrade(GRADE)
+                .withLocation(LOCATION)
+                .withStartDate(startDate)
+                .withRegistrationSigned(IS_REGISTRATION_SIGNED)
+                .withMediaReleaseSigned(IS_MEDIA_RELEASE_SIGNED)
+                .withTeacher(inboundStudentTeacher)
+                .withLeadershipTraits(new HashSet(Arrays.asList("INVALID")))
+                .build();
+
+        // execute the SUT
+        ResultActions result = mvc.perform(post("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")
+                .with(jwt().jwt(Jwt.withTokenValue("1234")
+                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
+                        .header("test", "value")
+                        .build()))
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(studentModel)));
+
+        // validation
+        result.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.timestamp", notNullValue()))
+                .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
+                .andExpect(jsonPath("$.error.length()", is(1)))
+                .andExpect(jsonPath("$.error.['Not found']", is("Invalid leadership trait: INVALID")))
+                .andExpect(jsonPath("$.message", is("Not found")))
+                .andExpect(jsonPath("$.path", is("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")));
+    }
+
+    @Test
+    void testCreateStudent_withInvalidMentor() throws Exception {
+        // setup the fixture
+        final URI TEACHER_URI = URI.create(
+                "http://localhost/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers/ba238442-ce51-450d" +
+                        "-a474-2e36872abe05");
+        final URI MENTOR_URI = URI.create(
+                "http://localhost/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/mentors/46771afb-a8ef-474e-b8e5" +
+                        "-c693529cc5a9");
+        String COMMENT = "COMMENT";
+        InboundStudentTeacher inboundStudentTeacher = InboundStudentTeacher.builder()
+                .withUri(TEACHER_URI)
+                .withComment(COMMENT)
+                .build();
+        InboundStudentMentor inboundStudentMentor = InboundStudentMentor.builder()
+                .withUri(MENTOR_URI)
+                .build();
+
+        String FIRST_NAME = "FIRST_NAME";
+        String LAST_NAME = "LAST_NAME";
+        int GRADE = 1;
+        ResourceLocation LOCATION = ResourceLocation.OFFLINE;
+        Date startDate = new Date();
+        Boolean IS_REGISTRATION_SIGNED = true;
+        Boolean IS_MEDIA_RELEASE_SIGNED = true;
+        InboundStudent studentModel = InboundStudent.builder()
+                .withFirstName(FIRST_NAME)
+                .withLastName(LAST_NAME)
+                .withGrade(GRADE)
+                .withLocation(LOCATION)
+                .withStartDate(startDate)
+                .withRegistrationSigned(IS_REGISTRATION_SIGNED)
+                .withMediaReleaseSigned(IS_MEDIA_RELEASE_SIGNED)
+                .withTeacher(inboundStudentTeacher)
+                .withMentor(inboundStudentMentor)
+                .build();
+
+        // execute the SUT
+        ResultActions result = mvc.perform(post("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")
+                .with(jwt().jwt(Jwt.withTokenValue("1234")
+                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
+                        .header("test", "value")
+                        .build()))
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(studentModel)));
+
+        // validation
+        result.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.timestamp", notNullValue()))
+                .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
+                .andExpect(jsonPath("$.error.length()", is(1)))
+                .andExpect(jsonPath("$.error.['Not found']", is("Unable to find specified mentor")))
+                .andExpect(jsonPath("$.message", is("Not found")))
+                .andExpect(jsonPath("$.path", is("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")));
+    }
+
+    @Test
+    void testCreateStudent_withLeadershipSkills() throws Exception {
+        // setup the fixture
+        final URI TEACHER_URI = URI.create(
+                "http://localhost/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers/ba238442-ce51-450d" +
+                        "-a474-2e36872abe05");
+        String COMMENT = "COMMENT";
+        InboundStudentTeacher inboundStudentTeacher = InboundStudentTeacher.builder()
+                .withUri(TEACHER_URI)
+                .withComment(COMMENT)
+                .build();
+
+        String FIRST_NAME = "FIRST_NAME";
+        String LAST_NAME = "LAST_NAME";
+        int GRADE = 1;
+        ResourceLocation LOCATION = ResourceLocation.OFFLINE;
+        Date startDate = new Date();
+        Boolean IS_REGISTRATION_SIGNED = true;
+        Boolean IS_MEDIA_RELEASE_SIGNED = true;
+        InboundStudent studentModel = InboundStudent.builder()
+                .withFirstName(FIRST_NAME)
+                .withLastName(LAST_NAME)
+                .withGrade(GRADE)
+                .withLocation(LOCATION)
+                .withStartDate(startDate)
+                .withRegistrationSigned(IS_REGISTRATION_SIGNED)
+                .withMediaReleaseSigned(IS_MEDIA_RELEASE_SIGNED)
+                .withTeacher(inboundStudentTeacher)
+                .withLeadershipSkills(new HashSet(Arrays.asList("Decision Making", "Planning")))
+                .build();
+
+        // execute the SUT
+        ResultActions result = mvc.perform(post("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")
+                .with(jwt().jwt(Jwt.withTokenValue("1234")
+                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
+                        .header("test", "value")
+                        .build()))
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(studentModel)));
+
+        // validation
+        result.andExpect(status().isCreated())
+                .andExpect(jsonPath("$.leadershipSkills.length()", is(2)))
+                .andExpect(jsonPath("$.leadershipSkills", hasItem("Decision Making")))
+                .andExpect(jsonPath("$.leadershipSkills", hasItem("Planning")));
+    }
+
+    @Test
+    void testCreateStudent_withLeadershipTraits() throws Exception {
+        // setup the fixture
+        final URI TEACHER_URI = URI.create(
+                "http://localhost/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers/ba238442-ce51-450d" +
+                        "-a474-2e36872abe05");
+        String COMMENT = "COMMENT";
+        InboundStudentTeacher inboundStudentTeacher = InboundStudentTeacher.builder()
+                .withUri(TEACHER_URI)
+                .withComment(COMMENT)
+                .build();
+
+        String FIRST_NAME = "FIRST_NAME";
+        String LAST_NAME = "LAST_NAME";
+        int GRADE = 1;
+        ResourceLocation LOCATION = ResourceLocation.OFFLINE;
+        Date startDate = new Date();
+        Boolean IS_REGISTRATION_SIGNED = true;
+        Boolean IS_MEDIA_RELEASE_SIGNED = true;
+        InboundStudent studentModel = InboundStudent.builder()
+                .withFirstName(FIRST_NAME)
+                .withLastName(LAST_NAME)
+                .withGrade(GRADE)
+                .withLocation(LOCATION)
+                .withStartDate(startDate)
+                .withRegistrationSigned(IS_REGISTRATION_SIGNED)
+                .withMediaReleaseSigned(IS_MEDIA_RELEASE_SIGNED)
+                .withTeacher(inboundStudentTeacher)
+                .withLeadershipTraits(new HashSet(Arrays.asList("Humility", "Responsibility")))
+                .build();
+
+        // execute the SUT
+        ResultActions result = mvc.perform(post("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")
+                .with(jwt().jwt(Jwt.withTokenValue("1234")
+                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
+                        .header("test", "value")
+                        .build()))
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(studentModel)));
+
+        // validation
+        result.andExpect(status().isCreated())
+                .andExpect(jsonPath("$.leadershipTraits.length()", is(2)))
+                .andExpect(jsonPath("$.leadershipTraits", hasItem("Humility")))
+                .andExpect(jsonPath("$.leadershipTraits", hasItem("Responsibility")));
     }
 
     @Test
@@ -979,59 +1035,20 @@ public class StudentControllerIntegrationTest {
     }
 
     @Test
-    void testCreateStudent_withInvalidMentor() throws Exception {
+    void testDeactivateStudent() throws Exception {
         // setup the fixture
-        final URI TEACHER_URI = URI.create(
-                "http://localhost/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers/ba238442-ce51-450d" +
-                        "-a474-2e36872abe05");
-        final URI MENTOR_URI = URI.create(
-                "http://localhost/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/mentors/46771afb-a8ef-474e-b8e5" +
-                        "-c693529cc5a9");
-        String COMMENT = "COMMENT";
-        InboundStudentTeacher inboundStudentTeacher = InboundStudentTeacher.builder()
-                .withUri(TEACHER_URI)
-                .withComment(COMMENT)
-                .build();
-        InboundStudentMentor inboundStudentMentor = InboundStudentMentor.builder()
-                .withUri(MENTOR_URI)
-                .build();
-
-        String FIRST_NAME = "FIRST_NAME";
-        String LAST_NAME = "LAST_NAME";
-        int GRADE = 1;
-        ResourceLocation LOCATION = ResourceLocation.OFFLINE;
-        Date startDate = new Date();
-        Boolean IS_REGISTRATION_SIGNED = true;
-        Boolean IS_MEDIA_RELEASE_SIGNED = true;
-        InboundStudent studentModel = InboundStudent.builder()
-                .withFirstName(FIRST_NAME)
-                .withLastName(LAST_NAME)
-                .withGrade(GRADE)
-                .withLocation(LOCATION)
-                .withStartDate(startDate)
-                .withRegistrationSigned(IS_REGISTRATION_SIGNED)
-                .withMediaReleaseSigned(IS_MEDIA_RELEASE_SIGNED)
-                .withTeacher(inboundStudentTeacher)
-                .withMentor(inboundStudentMentor)
-                .build();
+        // See SQL file
 
         // execute the SUT
-        ResultActions result = mvc.perform(post("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")
+        ResultActions result = mvc.perform(delete("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students" +
+                "/2a8c5871-a21d-47a1-a516-a6376a6b8bf2")
                 .with(jwt().jwt(Jwt.withTokenValue("1234")
                         .claim("cognito:groups", new SystemAdminAuthoritySetter())
                         .header("test", "value")
-                        .build()))
-                .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(studentModel)));
+                        .build())));
 
         // validation
-        result.andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.timestamp", notNullValue()))
-                .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
-                .andExpect(jsonPath("$.error.length()", is(1)))
-                .andExpect(jsonPath("$.error.['Not found']", is("Unable to find specified mentor")))
-                .andExpect(jsonPath("$.message", is("Not found")))
-                .andExpect(jsonPath("$.path", is("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students")));
+        result.andExpect(status().isNoContent());
     }
 
     @Test
@@ -1146,75 +1163,6 @@ public class StudentControllerIntegrationTest {
     }
 
     @Test
-    void testUpdateStudent_toNullMentor() throws Exception {
-        // setup the fixture
-        Map<String, Object> teacherModel = new HashMap<>();
-        teacherModel.put("uri", "http://localhost/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers" +
-                "/ba238442-ce51-450d-a474-2e36872abe05");
-        teacherModel.put("comment", "We need to talk");
-
-        Set<String> behaviors = Set.of("Perfectionism", "Bullying / Tattling");
-        Set<String> interests = Set.of("Cats", "Dogs");
-        Set<String> leadershipSkills = Set.of("Decision Making", "Planning");
-        Set<String> leadershipTraits = Set.of("Humility", "Responsibility");
-
-        Map<String, Object> contact1 = new HashMap<>();
-        contact1.put("label", "Parent");
-        contact1.put("firstName", "Peter");
-        contact1.put("lastName", "Parent");
-        contact1.put("isEmergencyContact", true);
-        contact1.put("phone", "(123) 456-7890");
-
-        Map<String, Object> studentModel = new HashMap<>();
-        studentModel.put("firstName", "NEW FIRST NAME");
-        studentModel.put("lastName", "NEW LAST NAME");
-        studentModel.put("grade", 3);
-        studentModel.put("preferredTime", "10:00am");
-        studentModel.put("location", "OFFLINE");
-        studentModel.put("registrationSigned", false);
-        studentModel.put("mediaReleaseSigned", false);
-        studentModel.put("teacher", teacherModel);
-        studentModel.put("mentor", null);
-        studentModel.put("behaviors", behaviors);
-        studentModel.put("interests", interests);
-        studentModel.put("leadershipSkills", leadershipSkills);
-        studentModel.put("leadershipTraits", leadershipTraits);
-        studentModel.put("contacts", Arrays.asList(contact1));
-
-        // execute the SUT
-        ResultActions result = mvc.perform(put("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students" +
-                "/2a8c5871-a21d-47a1-a516-a6376a6b8bf2")
-                .with(jwt().jwt(Jwt.withTokenValue("1234")
-                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
-                        .header("test", "value")
-                        .build()))
-                .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(studentModel)));
-
-        // validation
-        result.andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith("application/hal+json"))
-                .andExpect(jsonPath("$.firstName", is("NEW FIRST NAME")))
-                .andExpect(jsonPath("$.lastName", is("NEW LAST NAME")))
-                .andExpect(jsonPath("$.grade", is(3)))
-                .andExpect(jsonPath("$.preferredTime", is("10:00am")))
-                .andExpect(jsonPath("$.location", is("OFFLINE")))
-                .andExpect(jsonPath("$.registrationSigned", is(false)))
-                .andExpect(jsonPath("$.mediaReleaseSigned", is(false)))
-                .andExpect(jsonPath("$.teacher.teacher.firstName", is("Fred")))
-                .andExpect(jsonPath("$.teacher.teacher.lastName", is("Rogers")))
-                .andExpect(jsonPath("$.behaviors.size()", is(2)))
-                .andExpect(jsonPath("$.behaviors", hasItems("Perfectionism", "Bullying / Tattling")))
-                .andExpect(jsonPath("$.interests", hasItems("Cats", "Dogs")))
-                .andExpect(jsonPath("$.leadershipSkills", hasItems("Decision Making", "Planning")))
-                .andExpect(jsonPath("$.leadershipTraits", hasItems("Humility", "Responsibility")))
-                .andExpect(jsonPath("$.contacts[0].label", is("Parent")))
-                .andExpect(jsonPath("$.contacts[0].firstName", is("Peter")))
-                .andExpect(jsonPath("$.contacts[0].lastName", is("Parent")))
-                .andExpect(jsonPath("$.contacts[0].isEmergencyContact", is(true)));
-    }
-
-    @Test
     void testUpdateStudent_fromNullMentor() throws Exception {
         // setup the fixture
         Map<String, Object> teacherModel = new HashMap<>();
@@ -1284,20 +1232,72 @@ public class StudentControllerIntegrationTest {
     }
 
     @Test
-    void testDeactivateStudent() throws Exception {
+    void testUpdateStudent_toNullMentor() throws Exception {
         // setup the fixture
-        // See SQL file
+        Map<String, Object> teacherModel = new HashMap<>();
+        teacherModel.put("uri", "http://localhost/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/teachers" +
+                "/ba238442-ce51-450d-a474-2e36872abe05");
+        teacherModel.put("comment", "We need to talk");
+
+        Set<String> behaviors = Set.of("Perfectionism", "Bullying / Tattling");
+        Set<String> interests = Set.of("Cats", "Dogs");
+        Set<String> leadershipSkills = Set.of("Decision Making", "Planning");
+        Set<String> leadershipTraits = Set.of("Humility", "Responsibility");
+
+        Map<String, Object> contact1 = new HashMap<>();
+        contact1.put("label", "Parent");
+        contact1.put("firstName", "Peter");
+        contact1.put("lastName", "Parent");
+        contact1.put("isEmergencyContact", true);
+        contact1.put("phone", "(123) 456-7890");
+
+        Map<String, Object> studentModel = new HashMap<>();
+        studentModel.put("firstName", "NEW FIRST NAME");
+        studentModel.put("lastName", "NEW LAST NAME");
+        studentModel.put("grade", 3);
+        studentModel.put("preferredTime", "10:00am");
+        studentModel.put("location", "OFFLINE");
+        studentModel.put("registrationSigned", false);
+        studentModel.put("mediaReleaseSigned", false);
+        studentModel.put("teacher", teacherModel);
+        studentModel.put("mentor", null);
+        studentModel.put("behaviors", behaviors);
+        studentModel.put("interests", interests);
+        studentModel.put("leadershipSkills", leadershipSkills);
+        studentModel.put("leadershipTraits", leadershipTraits);
+        studentModel.put("contacts", Arrays.asList(contact1));
 
         // execute the SUT
-        ResultActions result = mvc.perform(delete("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students" +
+        ResultActions result = mvc.perform(put("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/students" +
                 "/2a8c5871-a21d-47a1-a516-a6376a6b8bf2")
                 .with(jwt().jwt(Jwt.withTokenValue("1234")
                         .claim("cognito:groups", new SystemAdminAuthoritySetter())
                         .header("test", "value")
-                        .build())));
+                        .build()))
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(studentModel)));
 
         // validation
-        result.andExpect(status().isNoContent());
+        result.andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith("application/hal+json"))
+                .andExpect(jsonPath("$.firstName", is("NEW FIRST NAME")))
+                .andExpect(jsonPath("$.lastName", is("NEW LAST NAME")))
+                .andExpect(jsonPath("$.grade", is(3)))
+                .andExpect(jsonPath("$.preferredTime", is("10:00am")))
+                .andExpect(jsonPath("$.location", is("OFFLINE")))
+                .andExpect(jsonPath("$.registrationSigned", is(false)))
+                .andExpect(jsonPath("$.mediaReleaseSigned", is(false)))
+                .andExpect(jsonPath("$.teacher.teacher.firstName", is("Fred")))
+                .andExpect(jsonPath("$.teacher.teacher.lastName", is("Rogers")))
+                .andExpect(jsonPath("$.behaviors.size()", is(2)))
+                .andExpect(jsonPath("$.behaviors", hasItems("Perfectionism", "Bullying / Tattling")))
+                .andExpect(jsonPath("$.interests", hasItems("Cats", "Dogs")))
+                .andExpect(jsonPath("$.leadershipSkills", hasItems("Decision Making", "Planning")))
+                .andExpect(jsonPath("$.leadershipTraits", hasItems("Humility", "Responsibility")))
+                .andExpect(jsonPath("$.contacts[0].label", is("Parent")))
+                .andExpect(jsonPath("$.contacts[0].firstName", is("Peter")))
+                .andExpect(jsonPath("$.contacts[0].lastName", is("Parent")))
+                .andExpect(jsonPath("$.contacts[0].isEmergencyContact", is(true)));
     }
 
 }

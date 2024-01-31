@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Aion Technology LLC
+ * Copyright 2023-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package io.aiontechnology.mentorsuccess.feature.workflow.controller;
 
 import io.aiontechnology.mentorsuccess.feature.workflow.process.TaskCompletionConsumer;
 import io.aiontechnology.mentorsuccess.model.inbound.student.InboundStudentAssessment;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,7 +28,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
 import java.util.Map;
 import java.util.UUID;
 

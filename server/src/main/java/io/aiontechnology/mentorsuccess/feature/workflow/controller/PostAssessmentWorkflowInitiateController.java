@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2023 Aion Technology LLC
+ * Copyright 2023-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import io.aiontechnology.mentorsuccess.feature.workflow.process.assessment.PostA
 import io.aiontechnology.mentorsuccess.feature.workflow.translation.IdToSchoolFunction;
 import io.aiontechnology.mentorsuccess.feature.workflow.translation.SchoolToCurrentSessionFunction;
 import io.aiontechnology.mentorsuccess.model.inbound.InboundPostAssessment;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,7 +31,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
 import java.net.URI;
 import java.util.Optional;
 import java.util.UUID;

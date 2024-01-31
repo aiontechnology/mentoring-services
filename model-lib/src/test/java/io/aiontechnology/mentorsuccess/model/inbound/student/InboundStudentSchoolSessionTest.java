@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Aion Technology LLC
+ * Copyright 2022-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,13 @@
 package io.aiontechnology.mentorsuccess.model.inbound.student;
 
 import io.aiontechnology.mentorsuccess.model.inbound.BaseValidatorTest;
+import jakarta.validation.ConstraintViolation;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import javax.validation.ConstraintViolation;
 import java.net.URI;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -36,45 +36,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 1.8.0
  */
 public class InboundStudentSchoolSessionTest extends BaseValidatorTest {
-
-    @Test
-    void testValid() {
-        // set up the fixture
-        InboundStudentTeacher inboundStudentTeacher = InboundStudentTeacher.builder()
-                .withUri(URI.create("http://test.com"))
-                .build();
-        InboundStudentSchoolSession inboundStudentSchoolSession = InboundStudentSchoolSession.builder()
-                .withStudent(URI.create("http://test.com"))
-                .withGrade(1)
-                .withPreferredTime("PREFERRED")
-                .withActualTime("ACTUAL")
-                .withLocation(BOTH)
-                .withRegistrationSigned(true)
-                .withMediaReleaseSigned(true)
-                .withTeacher(inboundStudentTeacher)
-                .build();
-
-        // execute the SUT
-        Set<ConstraintViolation<InboundStudentSchoolSession>> constraintViolations =
-                getValidator().validate(inboundStudentSchoolSession);
-
-        // validation
-        assertThat(constraintViolations.size()).isEqualTo(0);
-    }
-
-    @ParameterizedTest
-    @MethodSource("studentTeacherInstanceProvider")
-    void testInvalid(Pair<InboundStudentSchoolSession, String> studentSessionInstance) {
-        // set up the fixture
-
-        // execute the SUT
-        Set<ConstraintViolation<InboundStudentSchoolSession>> constraintViolations =
-                getValidator().validate(studentSessionInstance.getLeft());
-
-        // validation
-        assertThat(constraintViolations.size()).isEqualTo(1);
-        assertThat(constraintViolations.iterator().next().getMessage()).isEqualTo(studentSessionInstance.getRight());
-    }
 
     private static Stream<Pair<InboundStudentSchoolSession, String>> studentTeacherInstanceProvider() {
         InboundStudentTeacher inboundStudentTeacher = InboundStudentTeacher.builder()
@@ -179,6 +140,45 @@ public class InboundStudentSchoolSessionTest extends BaseValidatorTest {
                 ImmutablePair.of(nullLocation, "{studentsession.location.notNull}"),
                 ImmutablePair.of(nullMediaRelease, "{studentsession.mediaRelease.notNull}"),
                 ImmutablePair.of(nullTeacher, "{studentsession.teacher.notNull}"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("studentTeacherInstanceProvider")
+    void testInvalid(Pair<InboundStudentSchoolSession, String> studentSessionInstance) {
+        // set up the fixture
+
+        // execute the SUT
+        Set<ConstraintViolation<InboundStudentSchoolSession>> constraintViolations =
+                getValidator().validate(studentSessionInstance.getLeft());
+
+        // validation
+        assertThat(constraintViolations.size()).isEqualTo(1);
+        assertThat(constraintViolations.iterator().next().getMessage()).isEqualTo(studentSessionInstance.getRight());
+    }
+
+    @Test
+    void testValid() {
+        // set up the fixture
+        InboundStudentTeacher inboundStudentTeacher = InboundStudentTeacher.builder()
+                .withUri(URI.create("http://test.com"))
+                .build();
+        InboundStudentSchoolSession inboundStudentSchoolSession = InboundStudentSchoolSession.builder()
+                .withStudent(URI.create("http://test.com"))
+                .withGrade(1)
+                .withPreferredTime("PREFERRED")
+                .withActualTime("ACTUAL")
+                .withLocation(BOTH)
+                .withRegistrationSigned(true)
+                .withMediaReleaseSigned(true)
+                .withTeacher(inboundStudentTeacher)
+                .build();
+
+        // execute the SUT
+        Set<ConstraintViolation<InboundStudentSchoolSession>> constraintViolations =
+                getValidator().validate(inboundStudentSchoolSession);
+
+        // validation
+        assertThat(constraintViolations.size()).isEqualTo(0);
     }
 
 }

@@ -1,11 +1,11 @@
 /*
- * Copyright 2020 Aion Technology LLC
+ * Copyright 2020-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,8 +16,9 @@
 
 package io.aiontechnology.mentorsuccess.model.validation;
 
-import javax.validation.Constraint;
-import javax.validation.Payload;
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -43,11 +44,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface EnumNamePattern {
 
     /**
-     * Get the regular expression.
+     * Get the groups.
      *
-     * @return The regular expression.
+     * @return The groups.
      */
-    String regexp();
+    Class<?>[] groups() default {};
 
     /**
      * Get the message.
@@ -57,17 +58,17 @@ public @interface EnumNamePattern {
     String message() default "must match \"{regexp}\"";
 
     /**
-     * Get the groups.
-     *
-     * @return The groups.
-     */
-    Class<?>[] groups() default {};
-
-    /**
      * Get the payload.
      *
      * @return The payload.
      */
     Class<? extends Payload>[] payload() default {};
+
+    /**
+     * Get the regular expression.
+     *
+     * @return The regular expression.
+     */
+    String regexp();
 
 }

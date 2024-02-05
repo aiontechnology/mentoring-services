@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Aion Technology LLC
+ * Copyright 2022-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,13 @@
 
 package io.aiontechnology.mentorsuccess.model.inbound;
 
+import jakarta.validation.ConstraintViolation;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import javax.validation.ConstraintViolation;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -34,75 +34,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 1.8.0
  */
 public class InboundGameTest extends BaseValidatorTest {
-
-    @Test
-    void testValid() {
-        // set up the fixture
-        InboundGame inboundGame = InboundGame.builder()
-                .withName("NAME")
-                .withGrade1(1)
-                .withGrade2(2)
-                .withLocation(OFFLINE)
-                .build();
-
-        // execute the SUT
-        Set<ConstraintViolation<InboundGame>> constraintViolations =
-                getValidator().validate(inboundGame);
-
-        // validation
-        assertThat(constraintViolations.size()).isEqualTo(0);
-    }
-
-    @ParameterizedTest
-    @MethodSource("gameInstanceProvider")
-    void testInvalid(Pair<InboundGame, String> gameInstance) {
-        // set up the fixture
-
-        // execute the SUT
-        Set<ConstraintViolation<InboundGame>> constraintViolations = getValidator().validate(gameInstance.getLeft());
-
-        // validation
-        assertThat(constraintViolations.size()).isEqualTo(1);
-        assertThat(constraintViolations.iterator().next().getMessage()).isEqualTo(gameInstance.getRight());
-    }
-
-    @Test
-    void testGradesTooSmall() {
-        // set up the fixture
-        InboundGame gradesTooSmall = InboundGame.builder()
-                .withName("NAME")
-                .withGrade1(0)
-                .withGrade2(0)
-                .withLocation(OFFLINE)
-                .build();
-
-        // execute the SUT
-        Set<ConstraintViolation<InboundGame>> constraintViolations = getValidator().validate(gradesTooSmall);
-
-        // validation
-        assertThat(constraintViolations.size()).isEqualTo(2);
-        assertThat(constraintViolations.stream().anyMatch(g -> g.getMessage().equals("{game.grade1.invalid}")));
-        assertThat(constraintViolations.stream().anyMatch(g -> g.getMessage().equals("{game.grade2.invalid}")));
-    }
-
-    @Test
-    void testGradesTooLarge() {
-        // set up the fixture
-        InboundGame gradesTooSmall = InboundGame.builder()
-                .withName("NAME")
-                .withGrade1(7)
-                .withGrade2(7)
-                .withLocation(OFFLINE)
-                .build();
-
-        // execute the SUT
-        Set<ConstraintViolation<InboundGame>> constraintViolations = getValidator().validate(gradesTooSmall);
-
-        // validation
-        assertThat(constraintViolations.size()).isEqualTo(2);
-        assertThat(constraintViolations.stream().anyMatch(g -> g.getMessage().equals("{game.grade1.invalid}")));
-        assertThat(constraintViolations.stream().anyMatch(g -> g.getMessage().equals("{game.grade2.invalid}")));
-    }
 
     private static Stream<ImmutablePair<InboundGame, String>> gameInstanceProvider() {
         InboundGame nullName = InboundGame.builder()
@@ -141,4 +72,74 @@ public class InboundGameTest extends BaseValidatorTest {
                 ImmutablePair.of(nullGrade2, "{game.grade2.notNull}"),
                 ImmutablePair.of(grade1LargerThanGrade2, "{grade.range}"));
     }
+
+    @Test
+    void testGradesTooLarge() {
+        // set up the fixture
+        InboundGame gradesTooSmall = InboundGame.builder()
+                .withName("NAME")
+                .withGrade1(7)
+                .withGrade2(7)
+                .withLocation(OFFLINE)
+                .build();
+
+        // execute the SUT
+        Set<ConstraintViolation<InboundGame>> constraintViolations = getValidator().validate(gradesTooSmall);
+
+        // validation
+        assertThat(constraintViolations.size()).isEqualTo(2);
+        assertThat(constraintViolations.stream().anyMatch(g -> g.getMessage().equals("{game.grade1.invalid}")));
+        assertThat(constraintViolations.stream().anyMatch(g -> g.getMessage().equals("{game.grade2.invalid}")));
+    }
+
+    @Test
+    void testGradesTooSmall() {
+        // set up the fixture
+        InboundGame gradesTooSmall = InboundGame.builder()
+                .withName("NAME")
+                .withGrade1(0)
+                .withGrade2(0)
+                .withLocation(OFFLINE)
+                .build();
+
+        // execute the SUT
+        Set<ConstraintViolation<InboundGame>> constraintViolations = getValidator().validate(gradesTooSmall);
+
+        // validation
+        assertThat(constraintViolations.size()).isEqualTo(2);
+        assertThat(constraintViolations.stream().anyMatch(g -> g.getMessage().equals("{game.grade1.invalid}")));
+        assertThat(constraintViolations.stream().anyMatch(g -> g.getMessage().equals("{game.grade2.invalid}")));
+    }
+
+    @ParameterizedTest
+    @MethodSource("gameInstanceProvider")
+    void testInvalid(Pair<InboundGame, String> gameInstance) {
+        // set up the fixture
+
+        // execute the SUT
+        Set<ConstraintViolation<InboundGame>> constraintViolations = getValidator().validate(gameInstance.getLeft());
+
+        // validation
+        assertThat(constraintViolations.size()).isEqualTo(1);
+        assertThat(constraintViolations.iterator().next().getMessage()).isEqualTo(gameInstance.getRight());
+    }
+
+    @Test
+    void testValid() {
+        // set up the fixture
+        InboundGame inboundGame = InboundGame.builder()
+                .withName("NAME")
+                .withGrade1(1)
+                .withGrade2(2)
+                .withLocation(OFFLINE)
+                .build();
+
+        // execute the SUT
+        Set<ConstraintViolation<InboundGame>> constraintViolations =
+                getValidator().validate(inboundGame);
+
+        // validation
+        assertThat(constraintViolations.size()).isEqualTo(0);
+    }
+
 }

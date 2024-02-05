@@ -1,17 +1,17 @@
 /*
- * Copyright 2022 Aion Technology LLC
+ * Copyright 2022-2024 Aion Technology LLC
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package io.aiontechnology.mentorsuccess.api.controller;
@@ -21,6 +21,7 @@ import io.aiontechnology.mentorsuccess.model.enumeration.ResourceLocation;
 import io.aiontechnology.mentorsuccess.model.inbound.InboundSchoolSession;
 import io.aiontechnology.mentorsuccess.model.inbound.student.InboundStudentSchoolSession;
 import io.aiontechnology.mentorsuccess.security.SystemAdminAuthoritySetter;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -31,17 +32,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import javax.inject.Inject;
-import javax.transaction.Transactional;
 import java.net.URI;
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 
 import static io.aiontechnology.mentorsuccess.model.enumeration.ResourceLocation.OFFLINE;
-import static java.time.Month.DECEMBER;
-import static java.time.Month.JANUARY;
-import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
@@ -92,59 +88,6 @@ public class SchoolSessionControllerIntegrationTest {
     }
 
     @Test
-    void testGetSchoolSessions() throws Exception {
-        // setup the fixture
-
-        // execute the SUT
-        ResultActions result = mvc.perform(get("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/schoolsessions")
-                .with(jwt().jwt(Jwt.withTokenValue("1234")
-                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
-                        .header("test", "value")
-                        .build())));
-
-        // validation
-        result.andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith("application/hal+json"))
-                .andExpect(jsonPath("$._embedded.schoolSessionList").isArray())
-                .andExpect(jsonPath("$._embedded.schoolSessionList.length()", is(2)));
-    }
-
-    @Test
-    void testGetSchoolSession() throws Exception {
-        // setup the fixture
-
-        // execute the SUT
-        ResultActions result = mvc.perform(get("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/schoolsessions" +
-                "/e618f863-da09-4648-8098-5e0a8b21ff1f")
-                .with(jwt().jwt(Jwt.withTokenValue("1234")
-                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
-                        .header("test", "value")
-                        .build())));
-
-        // validation
-        result.andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith("application/hal+json"))
-                .andExpect(jsonPath("$.label", is("2021-2022")));
-    }
-
-    @Test
-    void testDeleteSchoolSession() throws Exception {
-        // setup the fixture
-        // See SQL file
-
-        // execute the SUT
-        ResultActions result = mvc.perform(delete("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10" +
-                "/schoolsessions/e618f863-da09-4648-8098-5e0a8b21ff1f")
-                .with(jwt().jwt(Jwt.withTokenValue("1234")
-                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
-                        .header("test", "value")
-                        .build())));
-
-        // validation
-        result.andExpect(status().isNoContent());
-    }
-
-    @Test
     @Disabled("Fix this")
     void testCreateStudentSchoolSession() throws Exception {
         // setup the fixture
@@ -180,6 +123,59 @@ public class SchoolSessionControllerIntegrationTest {
 
         // validation
         result.andExpect(status().isOk());
+    }
+
+    @Test
+    void testDeleteSchoolSession() throws Exception {
+        // setup the fixture
+        // See SQL file
+
+        // execute the SUT
+        ResultActions result = mvc.perform(delete("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10" +
+                "/schoolsessions/e618f863-da09-4648-8098-5e0a8b21ff1f")
+                .with(jwt().jwt(Jwt.withTokenValue("1234")
+                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
+                        .header("test", "value")
+                        .build())));
+
+        // validation
+        result.andExpect(status().isNoContent());
+    }
+
+    @Test
+    void testGetSchoolSession() throws Exception {
+        // setup the fixture
+
+        // execute the SUT
+        ResultActions result = mvc.perform(get("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/schoolsessions" +
+                "/e618f863-da09-4648-8098-5e0a8b21ff1f")
+                .with(jwt().jwt(Jwt.withTokenValue("1234")
+                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
+                        .header("test", "value")
+                        .build())));
+
+        // validation
+        result.andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith("application/hal+json"))
+                .andExpect(jsonPath("$.label", is("2021-2022")));
+    }
+
+    @Test
+    void testGetSchoolSessions() throws Exception {
+        // setup the fixture
+
+        // execute the SUT
+        ResultActions result = mvc.perform(get("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10/schoolsessions")
+                .with(jwt().jwt(Jwt.withTokenValue("1234")
+                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
+                        .header("test", "value")
+                        .build())));
+
+        // validation
+        result.andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith("application/hal+json"))
+                .andExpect(jsonPath("$._embedded.schoolSessionList").isArray())
+                .andExpect(jsonPath("$._embedded.schoolSessionList.length()", is(2)));
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Aion Technology LLC
+ * Copyright 2022-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,13 @@
 package io.aiontechnology.mentorsuccess.model.inbound.student;
 
 import io.aiontechnology.mentorsuccess.model.inbound.BaseValidatorTest;
+import jakarta.validation.ConstraintViolation;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import javax.validation.ConstraintViolation;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
@@ -36,6 +36,35 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 1.8.0
  */
 public class InboundStudentBahaviourTest extends BaseValidatorTest {
+
+    private static Stream<Pair<InboundStudentBehavior, String>> studentBehaviorInstanceProvider() {
+        Set<String> behaviours = new HashSet<>();
+        behaviours.add("TEST");
+        InboundStudentBehavior nullStudentBehavior = InboundStudentBehavior.builder()
+                .withBehaviors(null)
+                .withTeacher(URI.create("http://test.com"))
+                .build();
+        InboundStudentBehavior nullTeacher = InboundStudentBehavior.builder()
+                .withBehaviors(behaviours)
+                .withTeacher(null)
+                .build();
+        return Stream.of(ImmutablePair.of(nullStudentBehavior, "{studentbehavior.behavior.notNull}"),
+                ImmutablePair.of(nullTeacher, "{studentbehavior.teacher.notNull}"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("studentBehaviorInstanceProvider")
+    void testInvalid(Pair<InboundStudentBehavior, String> studentBehaviorInstance) {
+        // set up the fixture
+
+        // execute the SUT
+        Set<ConstraintViolation<InboundStudentBehavior>> constraintViolations =
+                getValidator().validate(studentBehaviorInstance.getLeft());
+
+        // validation
+        assertThat(constraintViolations.size()).isEqualTo(1);
+        assertThat(constraintViolations.iterator().next().getMessage()).isEqualTo(studentBehaviorInstance.getRight());
+    }
 
     @Test
     void testValid() {
@@ -53,35 +82,6 @@ public class InboundStudentBahaviourTest extends BaseValidatorTest {
 
         // validation
         assertThat(constraintViolations.size()).isEqualTo(0);
-    }
-
-    @ParameterizedTest
-    @MethodSource("studentBehaviorInstanceProvider")
-    void testInvalid(Pair<InboundStudentBehavior, String> studentBehaviorInstance) {
-        // set up the fixture
-
-        // execute the SUT
-        Set<ConstraintViolation<InboundStudentBehavior>> constraintViolations =
-                getValidator().validate(studentBehaviorInstance.getLeft());
-
-        // validation
-        assertThat(constraintViolations.size()).isEqualTo(1);
-        assertThat(constraintViolations.iterator().next().getMessage()).isEqualTo(studentBehaviorInstance.getRight());
-    }
-
-    private static Stream<Pair<InboundStudentBehavior, String>> studentBehaviorInstanceProvider() {
-        Set<String> behaviours = new HashSet<>();
-        behaviours.add("TEST");
-        InboundStudentBehavior nullStudentBehavior = InboundStudentBehavior.builder()
-                .withBehaviors(null)
-                .withTeacher(URI.create("http://test.com"))
-                .build();
-        InboundStudentBehavior nullTeacher = InboundStudentBehavior.builder()
-                .withBehaviors(behaviours)
-                .withTeacher(null)
-                .build();
-        return Stream.of(ImmutablePair.of(nullStudentBehavior, "{studentbehavior.behavior.notNull}"),
-                ImmutablePair.of(nullTeacher, "{studentbehavior.teacher.notNull}"));
     }
 
 }

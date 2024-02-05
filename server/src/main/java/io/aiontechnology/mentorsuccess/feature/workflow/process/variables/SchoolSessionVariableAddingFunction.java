@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Aion Technology LLC
+ * Copyright 2023-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 package io.aiontechnology.mentorsuccess.feature.workflow.process.variables;
 
 import io.aiontechnology.mentorsuccess.entity.SchoolSession;
-import liquibase.repackaged.org.apache.commons.collections4.map.HashedMap;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.map.HashedMap;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;

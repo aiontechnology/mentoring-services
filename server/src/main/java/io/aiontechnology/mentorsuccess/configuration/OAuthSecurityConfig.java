@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 Aion Technology LLC
+ * Copyright 2021-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,13 +63,13 @@ public class OAuthSecurityConfig {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web -> web.ignoring()
-                .antMatchers("/api/v1/schools/*/registrations/**")
-                .antMatchers("/api/v1/schools/*/students/*/registrations/*")
-                .antMatchers("/api/v1/schools/*/students/*/workflow/assessments/*")
-                .antMatchers(GET, "/api/v1/schools/*/programAdmins")
-                .antMatchers("/api/v1/behaviors")
-                .antMatchers("/api/v1/leadership_skills")
-                .antMatchers("/api/v1/leadership_traits");
+                .requestMatchers("/api/v1/schools/*/registrations/**")
+                .requestMatchers("/api/v1/schools/*/students/*/registrations/*")
+                .requestMatchers("/api/v1/schools/*/students/*/workflow/assessments/*")
+                .requestMatchers(GET, "/api/v1/schools/*/programAdmins")
+                .requestMatchers("/api/v1/behaviors")
+                .requestMatchers("/api/v1/leadership_skills")
+                .requestMatchers("/api/v1/leadership_traits");
     }
 
     @Bean

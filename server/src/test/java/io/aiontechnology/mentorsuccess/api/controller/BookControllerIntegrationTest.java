@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 Aion Technology LLC
+ * Copyright 2020-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package io.aiontechnology.mentorsuccess.api.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.aiontechnology.mentorsuccess.model.inbound.InboundBook;
 import io.aiontechnology.mentorsuccess.security.SystemAdminAuthoritySetter;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,7 +29,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import javax.inject.Inject;
-import javax.transaction.Transactional;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -101,6 +101,38 @@ public class BookControllerIntegrationTest {
     }
 
     @Test
+    void testCreateBook_fieldsInvalid() throws Exception {
+        // setup the fixture
+        InboundBook inboundBook = InboundBook.builder()
+                .withTitle(
+                        "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901")
+                .withAuthor("1234567890123456789012345678901")
+                .withGradeLevel(7)
+                .build();
+
+        // execute the SUT
+        ResultActions result = mvc.perform(post("/api/v1/books")
+                .with(jwt().jwt(Jwt.withTokenValue("1234")
+                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
+                        .header("test", "value")
+                        .build()))
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(inboundBook)));
+
+        // validation
+        result.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp", notNullValue()))
+                .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
+                .andExpect(jsonPath("$.error.length()", is(4)))
+                .andExpect(jsonPath("$.error.title", is("The title of a book can not be longer than 100 characters")))
+                .andExpect(jsonPath("$.error.author", is("The book's author can not be longer than 30 characters")))
+                .andExpect(jsonPath("$.error.gradeLevel", is("A grade level must be between 1st and 6th")))
+                .andExpect(jsonPath("$.error.location", is("A location is required for a book")))
+                .andExpect(jsonPath("$.message", is("Validation failed")))
+                .andExpect(jsonPath("$.path", is("/api/v1/books")));
+    }
+
+    @Test
     void testCreateBook_nullAllowedFields() throws Exception {
         // setup the fixture
         InboundBook inboundBook = InboundBook.builder()
@@ -160,38 +192,6 @@ public class BookControllerIntegrationTest {
     }
 
     @Test
-    void testCreateBook_fieldsInvalid() throws Exception {
-        // setup the fixture
-        InboundBook inboundBook = InboundBook.builder()
-                .withTitle(
-                        "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901")
-                .withAuthor("1234567890123456789012345678901")
-                .withGradeLevel(7)
-                .build();
-
-        // execute the SUT
-        ResultActions result = mvc.perform(post("/api/v1/books")
-                .with(jwt().jwt(Jwt.withTokenValue("1234")
-                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
-                        .header("test", "value")
-                        .build()))
-                .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(inboundBook)));
-
-        // validation
-        result.andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.timestamp", notNullValue()))
-                .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
-                .andExpect(jsonPath("$.error.length()", is(4)))
-                .andExpect(jsonPath("$.error.title", is("The title of a book can not be longer than 100 characters")))
-                .andExpect(jsonPath("$.error.author", is("The book's author can not be longer than 30 characters")))
-                .andExpect(jsonPath("$.error.gradeLevel", is("A grade level must be between 1st and 6th")))
-                .andExpect(jsonPath("$.error.location", is("A location is required for a book")))
-                .andExpect(jsonPath("$.message", is("Validation failed")))
-                .andExpect(jsonPath("$.path", is("/api/v1/books")));
-    }
-
-    @Test
     void testCreateBook_withRelations() throws Exception {
         // setup the fixture
         Map<String, Object> book = new HashMap<>();
@@ -234,6 +234,22 @@ public class BookControllerIntegrationTest {
                 .andExpect(jsonPath("$.tags[0]", is("TAG")))
                 .andExpect(jsonPath("$._links.length()", is(1)))
                 .andExpect(jsonPath("$._links.self[0].href", startsWith("http://localhost/api/v1/books/")));
+    }
+
+    @Test
+    void testDeactivateBook() throws Exception {
+        // setup the fixture
+        // See SQL file
+
+        // execute the SUT
+        ResultActions result = mvc.perform(delete("/api/v1/books/f53af381-d524-40f7-8df9-3e808c9ad46b")
+                .with(jwt().jwt(Jwt.withTokenValue("1234")
+                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
+                        .header("test", "value")
+                        .build())));
+
+        // validation
+        result.andExpect(status().isNoContent());
     }
 
     @Test
@@ -341,22 +357,6 @@ public class BookControllerIntegrationTest {
                 .andExpect(jsonPath("$.leadershipSkills[0]", is("LEADERSHIP_SKILL2")))
                 .andExpect(jsonPath("$._links.length()", is(1)))
                 .andExpect(jsonPath("$._links.self[0].href", startsWith("http://localhost/api/v1/books/")));
-    }
-
-    @Test
-    void testDeactivateBook() throws Exception {
-        // setup the fixture
-        // See SQL file
-
-        // execute the SUT
-        ResultActions result = mvc.perform(delete("/api/v1/books/f53af381-d524-40f7-8df9-3e808c9ad46b")
-                .with(jwt().jwt(Jwt.withTokenValue("1234")
-                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
-                        .header("test", "value")
-                        .build())));
-
-        // validation
-        result.andExpect(status().isNoContent());
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Aion Technology LLC
+ * Copyright 2023-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,24 +18,24 @@ package io.aiontechnology.mentorsuccess.workflow.student;
 
 import io.aiontechnology.mentorsuccess.model.inbound.InboundInvitation;
 import io.aiontechnology.mentorsuccess.velocity.RegistrationTimeoutEmailGenerator;
-import io.aiontechnology.mentorsuccess.workflow.EmailGeneratorSupport;
+import io.aiontechnology.mentorsuccess.workflow.ProgramAdministratorEmailGeneratorSupport;
 import io.aiontechnology.mentorsuccess.workflow.TaskUtilities;
-import lombok.RequiredArgsConstructor;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.springframework.stereotype.Service;
 
 import static io.aiontechnology.mentorsuccess.workflow.RegistrationWorkflowConstants.INVITATION;
 
 @Service
-@RequiredArgsConstructor
-public class InvitationEmailGenerationTimeoutTask extends EmailGeneratorSupport {
+public class InvitationEmailGenerationTimeoutTask extends ProgramAdministratorEmailGeneratorSupport {
 
-    private final TaskUtilities taskUtilities;
+    public InvitationEmailGenerationTimeoutTask(TaskUtilities taskUtilities) {
+        super(taskUtilities);
+    }
 
     @Override
     protected String getBody(DelegateExecution execution) {
-        String programAdminName = taskUtilities.getProgramAdminFullName(execution);
-        InboundInvitation invitation = taskUtilities.getRequiredVariable(execution, INVITATION,
+        String programAdminName = getTaskUtilities().getProgramAdminFullName(execution);
+        InboundInvitation invitation = getTaskUtilities().getRequiredVariable(execution, INVITATION,
                 InboundInvitation.class);
         return getGenerationStrategy(execution, RegistrationTimeoutEmailGenerator.class)
                 .render(programAdminName, invitation);
@@ -48,14 +48,9 @@ public class InvitationEmailGenerationTimeoutTask extends EmailGeneratorSupport 
 
     @Override
     protected String getSubject(DelegateExecution execution) {
-        InboundInvitation invitation = taskUtilities.getRequiredVariable(execution, INVITATION,
+        InboundInvitation invitation = getTaskUtilities().getRequiredVariable(execution, INVITATION,
                 InboundInvitation.class);
         return "Registration timed out for " + invitation.getStudentFullName();
-    }
-
-    @Override
-    protected String getTo(DelegateExecution execution) {
-        return taskUtilities.getProgramAdminEmail(execution);
     }
 
 }

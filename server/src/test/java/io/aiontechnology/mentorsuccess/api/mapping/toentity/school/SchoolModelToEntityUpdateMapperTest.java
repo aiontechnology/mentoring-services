@@ -1,11 +1,11 @@
 /*
- * Copyright 2020 Aion Technology LLC
+ * Copyright 2020-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -37,7 +37,7 @@ public class SchoolModelToEntityUpdateMapperTest {
 
     @Test
     void testMapping() throws Exception {
-        // setup the fixture
+        // set up the fixture
         String street1 = "STREET1";
         String street2 = "STREET2";
         String city = "CITY";
@@ -53,9 +53,10 @@ public class SchoolModelToEntityUpdateMapperTest {
                 .build();
 
         String name = "NAME";
-        String phone = "1234567890";
+        String phone = "123-456-7890";
         String district = "DISTRICT";
         boolean isPrivate = true;
+        String emailTag = "EMAIL_TAG";
 
         InboundSchool inboundSchool = InboundSchool.builder()
                 .withName(name)
@@ -63,12 +64,15 @@ public class SchoolModelToEntityUpdateMapperTest {
                 .withPhone(phone)
                 .withDistrict(district)
                 .withIsPrivate(isPrivate)
+                .withEmailTag(emailTag)
                 .build();
 
         School school = new School();
 
+        var phoneService = new PhoneService();
+
         SchoolModelToEntityUpdateMapper schoolModelToEntityUpdateMapper = new SchoolModelToEntityUpdateMapper(
-                new AddressModelToEntityUpdateMapper(), new PhoneService());
+                new AddressModelToEntityUpdateMapper(), phoneService);
 
         // execute the SUT
         Optional<School> result = schoolModelToEntityUpdateMapper.map(inboundSchool, school);
@@ -81,15 +85,16 @@ public class SchoolModelToEntityUpdateMapperTest {
         assertThat(result.get().getState()).isEqualTo(state);
         assertThat(result.get().getZip()).isEqualTo(zip);
         assertThat(result.get().getName()).isEqualTo(name);
-        assertThat(result.get().getPhone()).isEqualTo(phone);
+        assertThat(result.get().getPhone()).isEqualTo(phoneService.normalize(phone));
         assertThat(result.get().getDistrict()).isEqualTo(district);
         assertThat(result.get().getIsPrivate()).isEqualTo(isPrivate);
         assertThat(result.get().getIsActive()).isEqualTo(true);
+        assertThat(result.get().getEmailTag()).isEqualTo(emailTag);
     }
 
     @Test
     void testNull() throws Exception {
-        // setup the fixture
+        // set up the fixture
         School school = new School();
 
         SchoolModelToEntityUpdateMapper schoolModelToEntityUpdateMapper = new SchoolModelToEntityUpdateMapper(

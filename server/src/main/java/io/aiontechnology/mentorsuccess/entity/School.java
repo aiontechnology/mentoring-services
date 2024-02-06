@@ -108,6 +108,10 @@ public class School implements Identifiable<UUID> {
     @Column
     private Boolean isActive;
 
+    /** A tag that is appended to emails to mentorsuccess */
+    @Column
+    private String emailTag;
+
     /** The collection of {@link SchoolPersonRole Roles} associated with the school. */
     @ToString.Exclude
     @OneToMany(mappedBy = "school")

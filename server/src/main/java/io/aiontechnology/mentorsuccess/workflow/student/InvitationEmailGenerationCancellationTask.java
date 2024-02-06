@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Aion Technology LLC
+ * Copyright 2023-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,8 @@ package io.aiontechnology.mentorsuccess.workflow.student;
 
 import io.aiontechnology.mentorsuccess.model.inbound.InboundInvitation;
 import io.aiontechnology.mentorsuccess.velocity.RegistrationCancellationEmailGenerator;
-import io.aiontechnology.mentorsuccess.workflow.EmailGeneratorSupport;
+import io.aiontechnology.mentorsuccess.workflow.ProgramAdministratorEmailGeneratorSupport;
 import io.aiontechnology.mentorsuccess.workflow.TaskUtilities;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.springframework.stereotype.Service;
@@ -29,15 +28,16 @@ import static io.aiontechnology.mentorsuccess.workflow.RegistrationWorkflowConst
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
-public class InvitationEmailGenerationCancellationTask extends EmailGeneratorSupport {
+public class InvitationEmailGenerationCancellationTask extends ProgramAdministratorEmailGeneratorSupport {
 
-    private final TaskUtilities taskUtilities;
+    public InvitationEmailGenerationCancellationTask(TaskUtilities taskUtilities) {
+        super(taskUtilities);
+    }
 
     @Override
     protected String getBody(DelegateExecution execution) {
-        String programAdminName = taskUtilities.getProgramAdminFullName(execution);
-        InboundInvitation invitation = taskUtilities.getRequiredVariable(execution, INVITATION,
+        String programAdminName = getTaskUtilities().getProgramAdminFullName(execution);
+        InboundInvitation invitation = getTaskUtilities().getRequiredVariable(execution, INVITATION,
                 InboundInvitation.class);
         return getGenerationStrategy(execution, RegistrationCancellationEmailGenerator.class)
                 .render(programAdminName, invitation);
@@ -50,14 +50,9 @@ public class InvitationEmailGenerationCancellationTask extends EmailGeneratorSup
 
     @Override
     protected String getSubject(DelegateExecution execution) {
-        InboundInvitation invitation = taskUtilities.getRequiredVariable(execution, INVITATION,
+        InboundInvitation invitation = getTaskUtilities().getRequiredVariable(execution, INVITATION,
                 InboundInvitation.class);
         return "Registration cancelled for " + invitation.getStudentFullName();
-    }
-
-    @Override
-    protected String getTo(DelegateExecution execution) {
-        return taskUtilities.getProgramAdminEmail(execution);
     }
 
 }

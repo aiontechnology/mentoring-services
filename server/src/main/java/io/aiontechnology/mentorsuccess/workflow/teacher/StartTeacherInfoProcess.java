@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Aion Technology LLC
+ * Copyright 2023-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,19 @@
 
 package io.aiontechnology.mentorsuccess.workflow.teacher;
 
+import io.aiontechnology.mentorsuccess.entity.School;
 import io.aiontechnology.mentorsuccess.model.inbound.InboundInvitation;
+import io.aiontechnology.mentorsuccess.service.SchoolService;
 import io.aiontechnology.mentorsuccess.service.StudentRegistrationService;
+import io.aiontechnology.mentorsuccess.service.StudentService;
 import io.aiontechnology.mentorsuccess.workflow.TaskUtilities;
 import lombok.RequiredArgsConstructor;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 import static io.aiontechnology.mentorsuccess.workflow.RegistrationWorkflowConstants.INVITATION;
 import static io.aiontechnology.mentorsuccess.workflow.RegistrationWorkflowConstants.REGISTRATION_TIMEOUT;
@@ -39,7 +44,9 @@ public class StartTeacherInfoProcess implements JavaDelegate {
     private final RuntimeService runtimeService;
 
     // Services
+    private final SchoolService schoolService;
     private final StudentRegistrationService studentRegistrationService;
+    private final StudentService studentService;
 
     // Other
     private final TaskUtilities taskUtilities;
@@ -54,8 +61,16 @@ public class StartTeacherInfoProcess implements JavaDelegate {
         InboundInvitation invitation = taskUtilities.getRequiredVariable(execution, INVITATION,
                 InboundInvitation.class);
 
-        studentRegistrationService.startStudentInformationProcess(schoolId, studentId, teacherId,
-                invitation.getStudentRegistrationUri(), registrationTimeout);
+        var school = schoolService.getSchoolById(UUID.fromString(schoolId));
+        var currentSession = school
+                .map(School::getCurrentSession);
+        var student = currentSession
+                .flatMap(session -> studentService.getStudentById(UUID.fromString(studentId), session));
+        studentRegistrationService.startStudentInformationProcess(
+                school.orElseThrow(),
+                student.orElseThrow(),
+                invitation.getStudentRegistrationUri(),
+                registrationTimeout);
     }
 
 }

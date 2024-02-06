@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Aion Technology LLC
+ * Copyright 2022-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,36 +18,25 @@ package io.aiontechnology.mentorsuccess.service;
 
 import io.aiontechnology.mentorsuccess.entity.School;
 import io.aiontechnology.mentorsuccess.model.inbound.InboundInvitation;
+import io.aiontechnology.mentorsuccess.workflow.student.StudentRegistrationProcessVariableHolder;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.RuntimeService;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
-
-import static io.aiontechnology.mentorsuccess.workflow.RegistrationWorkflowConstants.INVITATION;
-import static io.aiontechnology.mentorsuccess.workflow.RegistrationWorkflowConstants.REGISTRATION_TIMEOUT;
-import static io.aiontechnology.mentorsuccess.workflow.RegistrationWorkflowConstants.REGISTRATION_TIMEOUT_VALUE;
-import static io.aiontechnology.mentorsuccess.workflow.RegistrationWorkflowConstants.SCHOOL_ID;
+import static io.aiontechnology.mentorsuccess.workflow.RegistrationWorkflowConstants.STUDENT_REGISTRATION_PROCESS;
 
 @Service
 @RequiredArgsConstructor()
-@Slf4j
 public class StudentInvitationService {
 
     // Services
     private final RuntimeService runtimeService;
 
     public void invite(InboundInvitation invitation, School school) {
-        runtimeService.startProcessInstanceByKey("register-student", createProcessVariables(invitation, school));
-    }
-
-    private Map<String, Object> createProcessVariables(InboundInvitation invitation, School school) {
-        return Map.of(
-                SCHOOL_ID, school.getId().toString(),
-                INVITATION, invitation,
-                REGISTRATION_TIMEOUT, REGISTRATION_TIMEOUT_VALUE
-        );
+        var processVariables = StudentRegistrationProcessVariableHolder.builder(school, invitation)
+                .build()
+                .processVariables();
+        runtimeService.startProcessInstanceByKey(STUDENT_REGISTRATION_PROCESS, processVariables);
     }
 
 }

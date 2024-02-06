@@ -21,7 +21,6 @@ import io.aiontechnology.mentorsuccess.api.error.NotFoundException;
 import io.aiontechnology.mentorsuccess.entity.School;
 import io.aiontechnology.mentorsuccess.entity.SchoolSession;
 import io.aiontechnology.mentorsuccess.entity.Student;
-import io.aiontechnology.mentorsuccess.entity.StudentSchoolSession;
 import io.aiontechnology.mentorsuccess.entity.workflow.StudentInformation;
 import io.aiontechnology.mentorsuccess.model.inbound.InboundBaseUri;
 import io.aiontechnology.mentorsuccess.model.inbound.student.InboundStudentInformation;
@@ -107,17 +106,16 @@ public class StudentInformationController {
     @PreAuthorize("hasAuthority('school:update')")
     public void startRegistration(@PathVariable("schoolId") UUID schoolId, @PathVariable("studentId") UUID studentId,
             @RequestBody @Valid InboundBaseUri baseUri) {
-        SchoolSession currentSession = schoolService.getSchoolById(schoolId)
-                .map(School::getCurrentSession)
-                .orElseThrow();
-        studentService.getStudentById(studentId, currentSession)
-                .flatMap(student -> student.findCurrentSessionForStudent(currentSession))
-                .map(StudentSchoolSession::getTeacher)
-                .ifPresent(teacher ->
-                        studentRegistrationService.startStudentInformationProcess(schoolId.toString(),
-                                studentId.toString(),
-                                teacher.getId().toString(), baseUri.getUri(), REGISTRATION_TIMEOUT_VALUE)
-                );
+        var school = schoolService.getSchoolById(schoolId);
+        var currentSession = school
+                .map(School::getCurrentSession);
+        var student = currentSession
+                .flatMap(session -> studentService.getStudentById(studentId, session));
+        studentRegistrationService.startStudentInformationProcess(
+                school.orElseThrow(),
+                student.orElseThrow(),
+                baseUri.getUri(),
+                REGISTRATION_TIMEOUT_VALUE);
     }
 
     /**

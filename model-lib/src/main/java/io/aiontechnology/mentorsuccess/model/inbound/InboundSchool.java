@@ -61,4 +61,7 @@ public class InboundSchool {
     /** Indicates whether the school is private or public */
     Boolean isPrivate;
 
+    /** A tag that is placed in all emails to mentorsuccess (e.g. mentorsuccess+tag@hisheartfoundation.org) */
+    String emailTag;
+
 }

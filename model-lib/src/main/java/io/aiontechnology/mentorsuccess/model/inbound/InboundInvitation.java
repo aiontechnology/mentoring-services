@@ -56,4 +56,8 @@ public class InboundInvitation implements Serializable {
         return studentFirstName + " " + studentLastName;
     }
 
+    public String getParent1FullName() {
+        return parent1FirstName + " " + parent1LastName;
+    }
+
 }

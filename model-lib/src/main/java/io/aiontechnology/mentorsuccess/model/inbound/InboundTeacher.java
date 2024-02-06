@@ -25,6 +25,9 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Value;
 
+import static io.aiontechnology.mentorsuccess.model.inbound.ValidationConstants.GRADE_MAX;
+import static io.aiontechnology.mentorsuccess.model.inbound.ValidationConstants.GRADE_MIN;
+
 /**
  * A model object for teachers.
  *
@@ -58,13 +61,13 @@ public class InboundTeacher {
     String cellPhone;
 
     /** First grade taught by teacher. */
-    @Min(value = 0, message = "{teacher.grade1.invalid}")
-    @Max(value = 5, message = "{teacher.grade1.invalid}")
+    @Min(value = GRADE_MIN, message = "{teacher.grade1.invalid}")
+    @Max(value = GRADE_MAX, message = "{teacher.grade1.invalid}")
     Integer grade1;
 
     /** Second grade taught by teacher. Null if there is only one grade. */
-    @Min(value = 0, message = "{teacher.grade1.invalid}")
-    @Max(value = 5, message = "{teacher.grade1.invalid}")
+    @Min(value = GRADE_MIN, message = "{teacher.grade1.invalid}")
+    @Max(value = GRADE_MAX, message = "{teacher.grade1.invalid}")
     Integer grade2;
 
 }

@@ -18,6 +18,7 @@ package io.aiontechnology.mentorsuccess.workflow.teacher;
 
 import io.aiontechnology.mentorsuccess.workflow.TaskUtilities;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Service;
@@ -26,12 +27,14 @@ import static io.aiontechnology.mentorsuccess.workflow.RegistrationWorkflowConst
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class LoadTeacherEmailAddressTask implements JavaDelegate {
 
     private final TaskUtilities taskUtilities;
 
     @Override
     public void execute(DelegateExecution execution) {
+        log.debug("Loading teacher email address");
         taskUtilities.getTeacherEmailAddress(execution)
                 .ifPresent(emailAddress -> execution.setTransientVariable(TEACHER_EMAIL_ADDRESS, emailAddress));
     }

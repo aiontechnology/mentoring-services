@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2023 Aion Technology LLC
+ * Copyright 2020-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,16 @@ import io.aiontechnology.mentorsuccess.entity.reference.LeadershipSkill;
 import io.aiontechnology.mentorsuccess.entity.reference.LeadershipTrait;
 import io.aiontechnology.mentorsuccess.model.Identifiable;
 import io.aiontechnology.mentorsuccess.model.enumeration.ResourceLocation;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,16 +40,6 @@ import org.hibernate.Hibernate;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Where;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;

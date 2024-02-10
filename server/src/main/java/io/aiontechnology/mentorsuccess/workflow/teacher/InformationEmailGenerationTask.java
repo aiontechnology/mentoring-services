@@ -17,7 +17,7 @@
 package io.aiontechnology.mentorsuccess.workflow.teacher;
 
 import io.aiontechnology.mentorsuccess.util.UriBuilder;
-import io.aiontechnology.mentorsuccess.velocity.TeacherInvitationEmailGenerator;
+import io.aiontechnology.mentorsuccess.velocity.TeacherEmailGeneratorSupport;
 import io.aiontechnology.mentorsuccess.workflow.EmailGeneratorSupport;
 import io.aiontechnology.mentorsuccess.workflow.TaskUtilities;
 import lombok.RequiredArgsConstructor;
@@ -32,25 +32,22 @@ import static io.aiontechnology.mentorsuccess.workflow.RegistrationWorkflowConst
 @RequiredArgsConstructor
 public class InformationEmailGenerationTask extends EmailGeneratorSupport {
 
-    // Email generation strategy
-    private final TeacherInvitationEmailGenerator emailGenerator;
-
     // Other
     private final TaskUtilities taskUtilities;
 
     @Override
     protected String getBody(DelegateExecution execution) {
-        return emailGenerator.render(
+        return getGenerationStrategy(execution, TeacherEmailGeneratorSupport.class).render(
                 taskUtilities.getTeacherFullName(execution).orElse(""),
                 taskUtilities.getStudentFullName(execution).orElse(""),
                 taskUtilities.getProgramAdminFullName(execution),
                 taskUtilities.getProgramAdminEmail(execution),
-                createInformationUri(execution).orElse(""));
+                createInformationUri(execution).orElse(""),
+                createAssessmentUri(execution).orElse(""));
     }
 
     @Override
     protected String getFrom(DelegateExecution execution) {
-//        return taskUtilities.getProgramAdminEmail(execution);
         return DEFAULT_FROM_EMAIL_ADDRESS;
     }
 
@@ -74,6 +71,19 @@ public class InformationEmailGenerationTask extends EmailGeneratorSupport {
                         .withPathAddition("students")
                         .withPathAddition(student.getId().toString())
                         .withPathAddition("information")
+                        .withPathAddition(execution.getProcessInstanceId())
+                        .build());
+    }
+
+    private Optional<String> createAssessmentUri(DelegateExecution execution) {
+        String registrationBase = taskUtilities.getRequiredVariable(execution, REGISTRATION_BASE, String.class);
+        return taskUtilities.getStudent(execution)
+                .map(student -> new UriBuilder(registrationBase)
+                        .withPathAddition("schools")
+                        .withPathAddition(student.getSchool().getId().toString())
+                        .withPathAddition("students")
+                        .withPathAddition(student.getId().toString())
+                        .withPathAddition("assessment")
                         .withPathAddition(execution.getProcessInstanceId())
                         .build());
     }

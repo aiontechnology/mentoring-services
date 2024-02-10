@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2023 Aion Technology LLC
+ * Copyright 2020-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package io.aiontechnology.mentorsuccess.api.error;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -26,7 +27,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Locale;

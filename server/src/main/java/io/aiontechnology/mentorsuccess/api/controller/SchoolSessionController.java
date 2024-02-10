@@ -1,11 +1,11 @@
 /*
- * Copyright 2022 Aion Technology LLC
+ * Copyright 2022-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,6 +30,8 @@ import io.aiontechnology.mentorsuccess.resource.SchoolSessionResource;
 import io.aiontechnology.mentorsuccess.service.SchoolService;
 import io.aiontechnology.mentorsuccess.service.SchoolSessionService;
 import io.aiontechnology.mentorsuccess.service.StudentSchoolSessionService;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.CollectionModel;
@@ -43,8 +45,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.transaction.Transactional;
-import javax.validation.Valid;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;

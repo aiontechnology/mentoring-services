@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 Aion Technology LLC
+ * Copyright 2020-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.aiontechnology.mentorsuccess.model.inbound.InboundAddress;
 import io.aiontechnology.mentorsuccess.model.inbound.InboundSchool;
 import io.aiontechnology.mentorsuccess.security.SystemAdminAuthoritySetter;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,7 +30,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import javax.inject.Inject;
-import javax.transaction.Transactional;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -124,6 +124,97 @@ public class SchoolControllerIntegrationTest {
     }
 
     @Test
+    void testCreateSchool_fieldsInvalid() throws Exception {
+        // setup the fixture
+        InboundAddress inboundAddress = InboundAddress.builder()
+                .withStreet1("123456789012345678901234567890123456789012345678901")
+                .withStreet2("123456789012345678901234567890123456789012345678901")
+                .withCity("123456789012345678901234567890123456789012345678901")
+                .withState("123")
+                .withZip("1234567890")
+                .build();
+        InboundSchool inboundSchool = InboundSchool.builder()
+                .withName(
+                        "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901")
+                .withAddress(inboundAddress)
+                .withPhone("12345678901")
+                .withDistrict("123456789012345678901234567890123456789012345678901")
+                .withIsPrivate(IS_PRIVITE)
+                .build();
+
+        // execute the SUT
+        ResultActions result = mvc.perform(post("/api/v1/schools")
+                .with(jwt().jwt(Jwt.withTokenValue("1234")
+                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
+                        .header("test", "value")
+                        .build()))
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(inboundSchool)));
+
+        // validation
+        result.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp", notNullValue()))
+                .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
+                .andExpect(jsonPath("$.error.length()", is(8)))
+                .andExpect(jsonPath("$.error.name", is("The school's name can not be longer than 100 characters")))
+                .andExpect(jsonPath("$.error['address.street1']", is("An address's street1 can not be longer than 50 " +
+                        "characters")))
+                .andExpect(jsonPath("$.error['address.street2']", is("An address's street2 can not be longer than 50 " +
+                        "characters")))
+                .andExpect(jsonPath("$.error['address.city']", is("An address's city can not be longer than 50 " +
+                        "characters")))
+                .andExpect(jsonPath("$.error['address.state']", is("An address's state must be 2 characters long")))
+                .andExpect(jsonPath("$.error['address.zip']", is("An address's zip must be between 5 and 9 characters" +
+                        " long")))
+                .andExpect(jsonPath("$.error.phone", is("The school's phone number is invalid")))
+                .andExpect(jsonPath("$.error.district", is("The school's district can not be longer than 50 " +
+                        "characters")))
+                .andExpect(jsonPath("$.message", is("Validation failed")))
+                .andExpect(jsonPath("$.path", is("/api/v1/schools")));
+    }
+
+    @Test
+    void testCreateSchool_nullAddress() throws Exception {
+        // setup the fixture
+        InboundAddress inboundAddress = null;
+        InboundSchool inboundSchool = InboundSchool.builder()
+                .withName(NAME)
+                .withAddress(inboundAddress)
+                .withPhone(PHONE)
+                .withDistrict(DISTRICT)
+                .withIsPrivate(IS_PRIVITE)
+                .build();
+
+        // execute the SUT
+        ResultActions result = mvc.perform(post("/api/v1/schools")
+                .with(jwt().jwt(Jwt.withTokenValue("1234")
+                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
+                        .header("test", "value")
+                        .build()))
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(inboundSchool)));
+
+        // validation
+        result.andExpect(status().isCreated())
+                .andExpect(content().contentTypeCompatibleWith("application/hal+json"))
+                .andExpect(jsonPath("$.name", is(NAME)))
+                .andExpect(jsonPath("$.address.street1", nullValue()))
+                .andExpect(jsonPath("$.address.street2", nullValue()))
+                .andExpect(jsonPath("$.address.city", nullValue()))
+                .andExpect(jsonPath("$.address.state", nullValue()))
+                .andExpect(jsonPath("$.address.zip", nullValue()))
+                .andExpect(jsonPath("$.phone", is(PHONE)))
+                .andExpect(jsonPath("$.district", is(DISTRICT)))
+                .andExpect(jsonPath("$.isPrivate", is(IS_PRIVITE)))
+                .andExpect(jsonPath("$._links.length()", is(3)))
+                .andExpect(jsonPath("$._links.self[0].href", startsWith("http://localhost/api/v1/schools/")))
+                .andExpect(jsonPath("$._links.teachers[0].href", startsWith("http://localhost/api/v1/schools/")))
+                .andExpect(jsonPath("$._links.teachers[0].href", endsWith("/teachers")))
+                .andExpect(jsonPath("$._links.programAdmins[0].href", startsWith("http://localhost/api/v1/schools/")))
+                .andExpect(jsonPath("$._links.programAdmins[0].href", endsWith("/programAdmins")));
+    }
+
+    @Test
     void testCreateSchool_nullAllowedFields() throws Exception {
         // setup the fixture
         InboundAddress inboundAddress = InboundAddress.builder()
@@ -171,47 +262,6 @@ public class SchoolControllerIntegrationTest {
     }
 
     @Test
-    void testCreateSchool_nullAddress() throws Exception {
-        // setup the fixture
-        InboundAddress inboundAddress = null;
-        InboundSchool inboundSchool = InboundSchool.builder()
-                .withName(NAME)
-                .withAddress(inboundAddress)
-                .withPhone(PHONE)
-                .withDistrict(DISTRICT)
-                .withIsPrivate(IS_PRIVITE)
-                .build();
-
-        // execute the SUT
-        ResultActions result = mvc.perform(post("/api/v1/schools")
-                .with(jwt().jwt(Jwt.withTokenValue("1234")
-                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
-                        .header("test", "value")
-                        .build()))
-                .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(inboundSchool)));
-
-        // validation
-        result.andExpect(status().isCreated())
-                .andExpect(content().contentTypeCompatibleWith("application/hal+json"))
-                .andExpect(jsonPath("$.name", is(NAME)))
-                .andExpect(jsonPath("$.address.street1", nullValue()))
-                .andExpect(jsonPath("$.address.street2", nullValue()))
-                .andExpect(jsonPath("$.address.city", nullValue()))
-                .andExpect(jsonPath("$.address.state", nullValue()))
-                .andExpect(jsonPath("$.address.zip", nullValue()))
-                .andExpect(jsonPath("$.phone", is(PHONE)))
-                .andExpect(jsonPath("$.district", is(DISTRICT)))
-                .andExpect(jsonPath("$.isPrivate", is(IS_PRIVITE)))
-                .andExpect(jsonPath("$._links.length()", is(3)))
-                .andExpect(jsonPath("$._links.self[0].href", startsWith("http://localhost/api/v1/schools/")))
-                .andExpect(jsonPath("$._links.teachers[0].href", startsWith("http://localhost/api/v1/schools/")))
-                .andExpect(jsonPath("$._links.teachers[0].href", endsWith("/teachers")))
-                .andExpect(jsonPath("$._links.programAdmins[0].href", startsWith("http://localhost/api/v1/schools/")))
-                .andExpect(jsonPath("$._links.programAdmins[0].href", endsWith("/programAdmins")));
-    }
-
-    @Test
     void testCreateSchool_nullRequiredValues() throws Exception {
         // setup the fixture
         InboundAddress inboundAddress = InboundAddress.builder()
@@ -249,47 +299,19 @@ public class SchoolControllerIntegrationTest {
     }
 
     @Test
-    void testCreateSchool_fieldsInvalid() throws Exception {
+    void testDeactivate() throws Exception {
         // setup the fixture
-        InboundAddress inboundAddress = InboundAddress.builder()
-                .withStreet1("123456789012345678901234567890123456789012345678901")
-                .withStreet2("123456789012345678901234567890123456789012345678901")
-                .withCity("123456789012345678901234567890123456789012345678901")
-                .withState("123")
-                .withZip("1234567890")
-                .build();
-        InboundSchool inboundSchool = InboundSchool.builder()
-                .withName("12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901")
-                .withAddress(inboundAddress)
-                .withPhone("12345678901")
-                .withDistrict("123456789012345678901234567890123456789012345678901")
-                .withIsPrivate(IS_PRIVITE)
-                .build();
+        // See SQL file
 
         // execute the SUT
-        ResultActions result = mvc.perform(post("/api/v1/schools")
+        ResultActions result = mvc.perform(delete("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10")
                 .with(jwt().jwt(Jwt.withTokenValue("1234")
                         .claim("cognito:groups", new SystemAdminAuthoritySetter())
                         .header("test", "value")
-                        .build()))
-                .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(inboundSchool)));
+                        .build())));
 
         // validation
-        result.andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.timestamp", notNullValue()))
-                .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
-                .andExpect(jsonPath("$.error.length()", is(8)))
-                .andExpect(jsonPath("$.error.name", is("The school's name can not be longer than 100 characters")))
-                .andExpect(jsonPath("$.error['address.street1']", is("An address's street1 can not be longer than 50 characters")))
-                .andExpect(jsonPath("$.error['address.street2']", is("An address's street2 can not be longer than 50 characters")))
-                .andExpect(jsonPath("$.error['address.city']", is("An address's city can not be longer than 50 characters")))
-                .andExpect(jsonPath("$.error['address.state']", is("An address's state must be 2 characters long")))
-                .andExpect(jsonPath("$.error['address.zip']", is("An address's zip must be between 5 and 9 characters long")))
-                .andExpect(jsonPath("$.error.phone", is("The school's phone number is invalid")))
-                .andExpect(jsonPath("$.error.district", is("The school's district can not be longer than 50 characters")))
-                .andExpect(jsonPath("$.message", is("Validation failed")))
-                .andExpect(jsonPath("$.path", is("/api/v1/schools")));
+        result.andExpect(status().isNoContent());
     }
 
     @Test
@@ -405,22 +427,6 @@ public class SchoolControllerIntegrationTest {
                 .andExpect(jsonPath("$._links.teachers[0].href", endsWith("/teachers")))
                 .andExpect(jsonPath("$._links.programAdmins[0].href", startsWith("http://localhost/api/v1/schools/")))
                 .andExpect(jsonPath("$._links.programAdmins[0].href", endsWith("/programAdmins")));
-    }
-
-    @Test
-    void testDeactivate() throws Exception {
-        // setup the fixture
-        // See SQL file
-
-        // execute the SUT
-        ResultActions result = mvc.perform(delete("/api/v1/schools/fd03c21f-cd39-4c05-b3f1-6d49618b6b10")
-                .with(jwt().jwt(Jwt.withTokenValue("1234")
-                        .claim("cognito:groups", new SystemAdminAuthoritySetter())
-                        .header("test", "value")
-                        .build())));
-
-        // validation
-        result.andExpect(status().isNoContent());
     }
 
 }

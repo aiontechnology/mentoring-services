@@ -74,78 +74,42 @@ public class StudentInformationStoreTask implements JavaDelegate {
                     currentStudentSchoolSession
                             .setStudentLeadershipTraits(mapLeadershipTraits(studentInformation, teacher));
                     currentStudentSchoolSession.setTeacherComment(studentInformation.getTeacherComment());
-                    currentStudentSchoolSession.setQuestion1(studentInformation.getQuestion1());
-                    currentStudentSchoolSession.setQuestion2(studentInformation.getQuestion2());
-                    currentStudentSchoolSession.setQuestion3(studentInformation.getQuestion3());
-                    currentStudentSchoolSession.setQuestion4(studentInformation.getQuestion4());
-                    currentStudentSchoolSession.setQuestion5(studentInformation.getQuestion5());
-                    currentStudentSchoolSession.setQuestion6(studentInformation.getQuestion6());
-                    currentStudentSchoolSession.setQuestion7(studentInformation.getQuestion7());
-                    currentStudentSchoolSession.setQuestion8(studentInformation.getQuestion8());
-                    currentStudentSchoolSession.setQuestion9(studentInformation.getQuestion9());
-                    currentStudentSchoolSession.setQuestion10(studentInformation.getQuestion10());
-                    currentStudentSchoolSession.setQuestion11(studentInformation.getQuestion11());
-                    currentStudentSchoolSession.setQuestion12(studentInformation.getQuestion12());
-                    currentStudentSchoolSession.setQuestion13(studentInformation.getQuestion13());
-                    currentStudentSchoolSession.setQuestion14(studentInformation.getQuestion14());
-                    currentStudentSchoolSession.setQuestion15(studentInformation.getQuestion15());
-                    currentStudentSchoolSession.setQuestion16(studentInformation.getQuestion16());
-                    currentStudentSchoolSession.setQuestion17(studentInformation.getQuestion17());
-                    currentStudentSchoolSession.setQuestion18(studentInformation.getQuestion18());
-                    currentStudentSchoolSession.setQuestion19(studentInformation.getQuestion19());
-                    currentStudentSchoolSession.setQuestion20(studentInformation.getQuestion20());
-                    currentStudentSchoolSession.setQuestion21(studentInformation.getQuestion21());
-                    currentStudentSchoolSession.setQuestion22(studentInformation.getQuestion22());
-                    currentStudentSchoolSession.setQuestion23(studentInformation.getQuestion23());
-                    currentStudentSchoolSession.setQuestion24(studentInformation.getQuestion24());
-                    currentStudentSchoolSession.setQuestion25(studentInformation.getQuestion25());
-                    currentStudentSchoolSession.setQuestion26(studentInformation.getQuestion26());
-                    currentStudentSchoolSession.setQuestion27(studentInformation.getQuestion27());
-                    currentStudentSchoolSession.setQuestion28(studentInformation.getQuestion28());
-                    currentStudentSchoolSession.setQuestion29(studentInformation.getQuestion29());
-                    currentStudentSchoolSession.setQuestion30(studentInformation.getQuestion30());
-                    currentStudentSchoolSession.setQuestion31(studentInformation.getQuestion31());
-                    currentStudentSchoolSession.setQuestion32(studentInformation.getQuestion32());
-                    currentStudentSchoolSession.setQuestion33(studentInformation.getQuestion33());
-                    currentStudentSchoolSession.setQuestion34(studentInformation.getQuestion34());
-                    currentStudentSchoolSession.setQuestion35(studentInformation.getQuestion35());
-                    currentStudentSchoolSession.setPreBehavioralAssessment(
-                            studentInformation.getQuestion1() +
-                                    studentInformation.getQuestion2() +
-                                    studentInformation.getQuestion3() +
-                                    studentInformation.getQuestion4() +
-                                    studentInformation.getQuestion5() +
-                                    studentInformation.getQuestion6() +
-                                    studentInformation.getQuestion7() +
-                                    studentInformation.getQuestion8() +
-                                    studentInformation.getQuestion9() +
-                                    studentInformation.getQuestion10() +
-                                    studentInformation.getQuestion11() +
-                                    studentInformation.getQuestion12() +
-                                    studentInformation.getQuestion13() +
-                                    studentInformation.getQuestion14() +
-                                    studentInformation.getQuestion15() +
-                                    studentInformation.getQuestion16() +
-                                    studentInformation.getQuestion17() +
-                                    studentInformation.getQuestion18() +
-                                    studentInformation.getQuestion19() +
-                                    studentInformation.getQuestion20() +
-                                    studentInformation.getQuestion21() +
-                                    studentInformation.getQuestion22() +
-                                    studentInformation.getQuestion23() +
-                                    studentInformation.getQuestion24() +
-                                    studentInformation.getQuestion25() +
-                                    studentInformation.getQuestion26() +
-                                    studentInformation.getQuestion27() +
-                                    studentInformation.getQuestion28() +
-                                    studentInformation.getQuestion29() +
-                                    studentInformation.getQuestion30() +
-                                    studentInformation.getQuestion31() +
-                                    studentInformation.getQuestion32() +
-                                    studentInformation.getQuestion33() +
-                                    studentInformation.getQuestion34() +
-                                    studentInformation.getQuestion35()
-                    );
+                    currentStudentSchoolSession.setPreQuestion1(studentInformation.getStudentAssessment().getQuestion1());
+                    currentStudentSchoolSession.setPreQuestion2(studentInformation.getStudentAssessment().getQuestion2());
+                    currentStudentSchoolSession.setPreQuestion3(studentInformation.getStudentAssessment().getQuestion3());
+                    currentStudentSchoolSession.setPreQuestion4(studentInformation.getStudentAssessment().getQuestion4());
+                    currentStudentSchoolSession.setPreQuestion5(studentInformation.getStudentAssessment().getQuestion5());
+                    currentStudentSchoolSession.setPreQuestion6(studentInformation.getStudentAssessment().getQuestion6());
+                    currentStudentSchoolSession.setPreQuestion7(studentInformation.getStudentAssessment().getQuestion7());
+                    currentStudentSchoolSession.setPreQuestion8(studentInformation.getStudentAssessment().getQuestion8());
+                    currentStudentSchoolSession.setPreQuestion9(studentInformation.getStudentAssessment().getQuestion9());
+                    currentStudentSchoolSession.setPreQuestion10(studentInformation.getStudentAssessment().getQuestion10());
+                    currentStudentSchoolSession.setPreQuestion11(studentInformation.getStudentAssessment().getQuestion11());
+                    currentStudentSchoolSession.setPreQuestion12(studentInformation.getStudentAssessment().getQuestion12());
+                    currentStudentSchoolSession.setPreQuestion13(studentInformation.getStudentAssessment().getQuestion13());
+                    currentStudentSchoolSession.setPreQuestion14(studentInformation.getStudentAssessment().getQuestion14());
+                    currentStudentSchoolSession.setPreQuestion15(studentInformation.getStudentAssessment().getQuestion15());
+                    currentStudentSchoolSession.setPreQuestion16(studentInformation.getStudentAssessment().getQuestion16());
+                    currentStudentSchoolSession.setPreQuestion17(studentInformation.getStudentAssessment().getQuestion17());
+                    currentStudentSchoolSession.setPreQuestion18(studentInformation.getStudentAssessment().getQuestion18());
+                    currentStudentSchoolSession.setPreQuestion19(studentInformation.getStudentAssessment().getQuestion19());
+                    currentStudentSchoolSession.setPreQuestion20(studentInformation.getStudentAssessment().getQuestion20());
+                    currentStudentSchoolSession.setPreQuestion21(studentInformation.getStudentAssessment().getQuestion21());
+                    currentStudentSchoolSession.setPreQuestion22(studentInformation.getStudentAssessment().getQuestion22());
+                    currentStudentSchoolSession.setPreQuestion23(studentInformation.getStudentAssessment().getQuestion23());
+                    currentStudentSchoolSession.setPreQuestion24(studentInformation.getStudentAssessment().getQuestion24());
+                    currentStudentSchoolSession.setPreQuestion25(studentInformation.getStudentAssessment().getQuestion25());
+                    currentStudentSchoolSession.setPreQuestion26(studentInformation.getStudentAssessment().getQuestion26());
+                    currentStudentSchoolSession.setPreQuestion27(studentInformation.getStudentAssessment().getQuestion27());
+                    currentStudentSchoolSession.setPreQuestion28(studentInformation.getStudentAssessment().getQuestion28());
+                    currentStudentSchoolSession.setPreQuestion29(studentInformation.getStudentAssessment().getQuestion29());
+                    currentStudentSchoolSession.setPreQuestion30(studentInformation.getStudentAssessment().getQuestion30());
+                    currentStudentSchoolSession.setPreQuestion31(studentInformation.getStudentAssessment().getQuestion31());
+                    currentStudentSchoolSession.setPreQuestion32(studentInformation.getStudentAssessment().getQuestion32());
+                    currentStudentSchoolSession.setPreQuestion33(studentInformation.getStudentAssessment().getQuestion33());
+                    currentStudentSchoolSession.setPreQuestion34(studentInformation.getStudentAssessment().getQuestion34());
+                    currentStudentSchoolSession.setPreQuestion35(studentInformation.getStudentAssessment().getQuestion35());
+                    currentStudentSchoolSession.setPreBehavioralAssessment(studentInformation.getStudentAssessment().answerSum());
                     studentService.updateStudent(student);
                 });
     }

@@ -1,0 +1,369 @@
+# Copyright 2023 Aion Technology LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+databaseChangeLog:
+  - changeSet:
+      id: 58
+      author: whitney
+      changes:
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question1
+            newColumnName: pre_question1
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question2
+            newColumnName: pre_question2
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question3
+            newColumnName: pre_question3
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question4
+            newColumnName: pre_question4
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question5
+            newColumnName: pre_question5
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question6
+            newColumnName: pre_question6
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question7
+            newColumnName: pre_question7
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question8
+            newColumnName: pre_question8
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question9
+            newColumnName: pre_question9
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question10
+            newColumnName: pre_question10
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question11
+            newColumnName: pre_question11
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question12
+            newColumnName: pre_question12
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question13
+            newColumnName: pre_question13
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question14
+            newColumnName: pre_question14
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question15
+            newColumnName: pre_question15
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question16
+            newColumnName: pre_question16
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question17
+            newColumnName: pre_question17
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question18
+            newColumnName: pre_question18
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question19
+            newColumnName: pre_question19
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question20
+            newColumnName: pre_question20
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question21
+            newColumnName: pre_question21
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question22
+            newColumnName: pre_question22
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question23
+            newColumnName: pre_question23
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question24
+            newColumnName: pre_question24
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question25
+            newColumnName: pre_question25
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question26
+            newColumnName: pre_question26
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question27
+            newColumnName: pre_question27
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question28
+            newColumnName: pre_question28
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question29
+            newColumnName: pre_question29
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question30
+            newColumnName: pre_question30
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question31
+            newColumnName: pre_question31
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question32
+            newColumnName: pre_question32
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question33
+            newColumnName: pre_question33
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question34
+            newColumnName: pre_question34
+        - renameColumn:
+            tableName: student_schoolsession
+            oldColumnName: question35
+            newColumnName: pre_question35
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question1
+                  type: number
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question2
+                  type: number
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question3
+                  type: number
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question4
+                  type: number
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question5
+                  type: number
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question6
+                  type: number
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question7
+                  type: number
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question8
+                  type: number
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question9
+                  type: number
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question10
+                  type: number
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question11
+                  type: number
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question12
+                  type: number
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question13
+                  type: number
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question14
+                  type: number
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question15
+                  type: number
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question16
+                  type: number
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question17
+                  type: number
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question18
+                  type: number
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question19
+                  type: number
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question20
+                  type: number
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question21
+                  type: number
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question22
+                  type: number
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question23
+                  type: number
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question24
+                  type: number
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question25
+                  type: number
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question26
+                  type: number
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question27
+                  type: number
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question28
+                  type: number
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question29
+                  type: number
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question30
+                  type: number
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question31
+                  type: number
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question32
+                  type: number
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question33
+                  type: number
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question34
+                  type: number
+        - addColumn:
+            tableName: student_schoolsession
+            columns:
+              - column:
+                  name: post_question35
+                  type: number

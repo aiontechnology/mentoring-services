@@ -37,6 +37,10 @@
             <documentation>
                 Generate the email that should be sent to the parent.
             </documentation>
+            <extensionElements>
+                <flowable:field name="generationStrategyClassName"
+                                expression="${generationStrategyClassName}"/>
+            </extensionElements>
         </serviceTask>
 
         <serviceTask id="sendInvitationEmail"

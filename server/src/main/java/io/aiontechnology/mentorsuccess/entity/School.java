@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 Aion Technology LLC
+ * Copyright 2020-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,18 @@
 package io.aiontechnology.mentorsuccess.entity;
 
 import io.aiontechnology.mentorsuccess.model.Identifiable;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.OrderBy;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,23 +41,9 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.ParamDef;
 import org.hibernate.annotations.Where;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.OrderBy;
-import javax.persistence.Table;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.UUID;
-
-import static javax.persistence.CascadeType.ALL;
 
 /**
  * Entity that represents a school.
@@ -61,7 +59,7 @@ import static javax.persistence.CascadeType.ALL;
 @Setter
 @ToString
 @Where(clause = "is_active = true")
-@FilterDef(name = "roleType", parameters = @ParamDef(name = "type", type = "string"))
+@FilterDef(name = "roleType", parameters = @ParamDef(name = "type", type = String.class))
 public class School implements Identifiable<UUID> {
 
     /** The ID of the school. */
@@ -122,13 +120,13 @@ public class School implements Identifiable<UUID> {
     private Collection<SchoolSession> sessions;
 
     @ToString.Exclude
-    @OneToOne(cascade = ALL)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "current_session_id", referencedColumnName = "id")
     private SchoolSession currentSession;
 
     /** The collection of {@link Student Students} associated with the school. */
     @ToString.Exclude
-    @OneToMany(mappedBy = "school", cascade = ALL)
+    @OneToMany(mappedBy = "school", cascade = CascadeType.ALL)
     @OrderBy("lastName")
     private Collection<Student> students;
 

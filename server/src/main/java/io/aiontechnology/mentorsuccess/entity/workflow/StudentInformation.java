@@ -17,13 +17,19 @@
 package io.aiontechnology.mentorsuccess.entity.workflow;
 
 import io.aiontechnology.mentorsuccess.model.Identifiable;
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.UUID;
 
+/**
+ * Represents information about a student.
+ */
 @Data
+@Builder
 public class StudentInformation implements Identifiable<UUID> {
 
+    /** Represents the students globally unique ID. */
     private UUID id;
 
     private String studentName;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Aion Technology LLC
+ * Copyright 2022-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,13 @@
 
 package io.aiontechnology.mentorsuccess.model.inbound;
 
+import jakarta.validation.ConstraintViolation;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import javax.validation.ConstraintViolation;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -33,39 +33,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 1.8.0
  */
 public class InboundAddressTest extends BaseValidatorTest {
-
-    @Test
-    void testValid() {
-        // setup the fixture
-        InboundAddress inboundAddress = InboundAddress.builder()
-                .withStreet1("STREET1")
-                .withStreet2("STREET2")
-                .withCity("CITY")
-                .withState("ST")
-                .withZip("98682")
-                .build();
-
-        // execute the SUT
-        Set<ConstraintViolation<InboundAddress>> constraintViolations =
-                getValidator().validate(inboundAddress);
-
-        // validation
-        assertThat(constraintViolations.size()).isEqualTo(0);
-    }
-
-    @ParameterizedTest
-    @MethodSource("addressInstanceProvider")
-    void testInvalid(Pair<InboundAddress, String> addressInstance) {
-        // set up the fixture
-
-        // execute the SUT
-        Set<ConstraintViolation<InboundAddress>> constraintViolations =
-                getValidator().validate(addressInstance.getLeft());
-
-        // validation
-        assertThat(constraintViolations.size()).isEqualTo(1);
-        assertThat(constraintViolations.iterator().next().getMessage()).isEqualTo(addressInstance.getRight());
-    }
 
     private static Stream<Pair<InboundAddress, String>> addressInstanceProvider() {
         InboundAddress street1TooLong = InboundAddress.builder()
@@ -96,6 +63,39 @@ public class InboundAddressTest extends BaseValidatorTest {
                 ImmutablePair.of(stateTooLong, "{address.state.size}"),
                 ImmutablePair.of(zipTooShort, "{address.zip.size}"),
                 ImmutablePair.of(zipTooLong, "{address.zip.size}"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("addressInstanceProvider")
+    void testInvalid(Pair<InboundAddress, String> addressInstance) {
+        // set up the fixture
+
+        // execute the SUT
+        Set<ConstraintViolation<InboundAddress>> constraintViolations =
+                getValidator().validate(addressInstance.getLeft());
+
+        // validation
+        assertThat(constraintViolations.size()).isEqualTo(1);
+        assertThat(constraintViolations.iterator().next().getMessage()).isEqualTo(addressInstance.getRight());
+    }
+
+    @Test
+    void testValid() {
+        // setup the fixture
+        InboundAddress inboundAddress = InboundAddress.builder()
+                .withStreet1("STREET1")
+                .withStreet2("STREET2")
+                .withCity("CITY")
+                .withState("ST")
+                .withZip("98682")
+                .build();
+
+        // execute the SUT
+        Set<ConstraintViolation<InboundAddress>> constraintViolations =
+                getValidator().validate(inboundAddress);
+
+        // validation
+        assertThat(constraintViolations.size()).isEqualTo(0);
     }
 
 }

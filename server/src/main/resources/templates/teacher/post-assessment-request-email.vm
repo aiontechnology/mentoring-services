@@ -1,0 +1,64 @@
+<!--
+  ~ Copyright 2023 Aion Technology LLC
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!-- Template for the email that is sent to teachers to request them to provide post assessment information -->
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+    <style>
+        img {
+            width: 75%;
+            height: auto;
+        }
+
+        .button {
+            text-decoration: none;
+            color: white;
+            background-color: #5DADBD;
+            padding: 8px 24px 8px 24px;
+            margin: 20px 20px 20px 0;
+            border-radius: 10px;
+            border-top: 1px solid #CCCCCC;
+            border-right: 1px solid #333333;
+            border-bottom: 1px solid #333333;
+            border-left: 1px solid #CCCCCC;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <img src="https://mentorsuccess-public.s3.us-west-2.amazonaws.com/email-logo.png"/>
+    <p>
+        Dear ${teacherFirstName},
+    </p>
+    <p>
+        Please provide feedback on <b>${studentName}</b> by clicking the button below. Data collection is a necessary
+        piece of this program. We need your input and value your time. This survey should not take more than five
+        minutes to complete. If you have any questions, please email
+        <a href="mailto:${programAdminEmail}"><b>${programAdminEmail}</b></a>. Thank you!
+    </p>
+    <p>
+        <br/><br/>
+        <a class="button" href="${studentAssessmentUri}?student=${studentName}">Fill In Student Info</a>
+        <br/><br/>
+    </p>
+    <p>
+        <b>${programAdminName}</b><br/>
+        MentorSuccess™ Program Administrator<br/>
+        <a href="mailto:${programAdminEmail}"><b>${programAdminEmail}</b></a><br/>
+        <a href="https://www.mentorsuccesskids.com">mentorsuccesskids.com</a>
+    </p>
+</div>
+</body>

@@ -17,8 +17,6 @@
 package io.aiontechnology.mentorsuccess.service;
 
 import io.aiontechnology.mentorsuccess.entity.School;
-import io.aiontechnology.mentorsuccess.entity.SchoolPersonRole;
-import io.aiontechnology.mentorsuccess.model.enumeration.RoleType;
 import io.aiontechnology.mentorsuccess.model.inbound.InboundInvitation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +24,6 @@ import org.flowable.engine.RuntimeService;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
-import java.util.Optional;
 
 import static io.aiontechnology.mentorsuccess.workflow.RegistrationWorkflowConstants.INVITATION;
 import static io.aiontechnology.mentorsuccess.workflow.RegistrationWorkflowConstants.REGISTRATION_TIMEOUT;
@@ -51,12 +48,6 @@ public class StudentInvitationService {
                 INVITATION, invitation,
                 REGISTRATION_TIMEOUT, REGISTRATION_TIMEOUT_VALUE
         );
-    }
-
-    private Optional<SchoolPersonRole> getProgramAdminInfo(School school) {
-        return school.getRoles().stream()
-                .filter(role -> role.getType().equals(RoleType.PROGRAM_ADMIN))
-                .findFirst();
     }
 
 }

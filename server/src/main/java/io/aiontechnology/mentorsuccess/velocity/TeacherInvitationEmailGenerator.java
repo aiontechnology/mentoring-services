@@ -16,38 +16,13 @@
 
 package io.aiontechnology.mentorsuccess.velocity;
 
-import lombok.RequiredArgsConstructor;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
-import org.springframework.stereotype.Service;
-
-import java.io.StringWriter;
-
-@Service
-@RequiredArgsConstructor
-public class TeacherInvitationEmailGenerator extends VelocityGenerationStrategySupport {
+public class TeacherInvitationEmailGenerator extends TeacherEmailGeneratorSupport {
 
     private static final String TEMPLATE_NAME = "templates/teacher/information-request-email.vm";
 
-    public String render(String teacherFirstName, String studentName, String programAdminName, String programAdminEmail,
-            String studentInfoUri) {
-        VelocityContext context = createContext(teacherFirstName, studentName, programAdminName, programAdminEmail,
-                studentInfoUri);
-        StringWriter writer = new StringWriter();
-
-        Velocity.getTemplate(TEMPLATE_NAME).merge(context, writer);
-        return writer.toString();
-    }
-
-    private VelocityContext createContext(String teacherFirstName, String studentName, String programAdminName,
-            String programAdminEmail, String studentInfoUri) {
-        VelocityContext context = new VelocityContext();
-        context.put("teacherFirstName", teacherFirstName);
-        context.put("studentName", studentName);
-        context.put("programAdminName", programAdminName);
-        context.put("programAdminEmail", programAdminEmail);
-        context.put("studentInfoUri", studentInfoUri);
-        return context;
+    @Override
+    protected String getTemplateName() {
+        return TEMPLATE_NAME;
     }
 
 }

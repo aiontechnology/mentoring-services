@@ -48,6 +48,10 @@
             <documentation>
                 Generate an email to inform the program administrator that a student registration workflow has timed out
             </documentation>
+            <extensionElements>
+                <flowable:field name="generationStrategyClassName"
+                                stringValue="io.aiontechnology.mentorsuccess.velocity.StudentInfoTimeoutEmailGenerator"/>
+            </extensionElements>
         </serviceTask>
 
         <serviceTask id="sendTeacherInformationTimeoutEmail"
@@ -76,6 +80,8 @@
                       name="Request Student Info 1"
                       calledElement="contact-teacher">
             <extensionElements>
+                <flowable:in sourceExpression="io.aiontechnology.mentorsuccess.velocity.TeacherInvitationEmailGenerator"
+                             target="generationStrategyClassName"/>
                 <flowable:in source="schoolId" target="schoolId"/>
                 <flowable:in source="studentId" target="studentId"/>
                 <flowable:in source="teacherId" target="teacherId"/>
@@ -86,8 +92,10 @@
 
         <callActivity id="receiveInfo1"
                       name="Receive Student Info 1"
-                      calledElement="record-and-notify">
+                      calledElement="registration-record-and-notify">
             <extensionElements>
+                <flowable:in sourceExpression="io.aiontechnology.mentorsuccess.velocity.TeacherInvitationCompleteEmailGenerator"
+                             target="generationStrategyClassName"/>
                 <flowable:in source="schoolId" target="schoolId"/>
                 <flowable:in source="studentId" target="studentId"/>
                 <flowable:in source="teacherId" target="teacherId"/>
@@ -105,6 +113,8 @@
                       name="Request Student Info 2"
                       calledElement="contact-teacher">
             <extensionElements>
+                <flowable:in sourceExpression="io.aiontechnology.mentorsuccess.velocity.TeacherInvitationEmailGenerator"
+                             target="generationStrategyClassName"/>
                 <flowable:in source="schoolId" target="schoolId"/>
                 <flowable:in source="studentId" target="studentId"/>
                 <flowable:in source="teacherId" target="teacherId"/>
@@ -115,7 +125,7 @@
 
         <callActivity id="receiveInfo2"
                       name="Receive Student Info 2"
-                      calledElement="record-and-notify">
+                      calledElement="registration-record-and-notify">
             <extensionElements>
                 <flowable:in source="schoolId" target="schoolId"/>
                 <flowable:in source="studentId" target="studentId"/>
@@ -136,6 +146,10 @@
             <documentation>
                 Generate an email to inform the program administrator that a teacher is not valid
             </documentation>
+            <extensionElements>
+                <flowable:field name="generationStrategyClassName"
+                                stringValue="io.aiontechnology.mentorsuccess.velocity.TeacherInvalidEmailGenerator"/>
+            </extensionElements>
         </serviceTask>
 
         <serviceTask id="sendTeacherInvalidEmail"

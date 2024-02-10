@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Aion Technology LLC
+ * Copyright 2022-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,14 @@ package io.aiontechnology.mentorsuccess.model.inbound.student;
 
 import io.aiontechnology.mentorsuccess.model.enumeration.ResourceLocation;
 import io.aiontechnology.mentorsuccess.model.validation.EnumNamePattern;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Value;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.net.URI;
 import java.util.Date;
 import java.util.Set;

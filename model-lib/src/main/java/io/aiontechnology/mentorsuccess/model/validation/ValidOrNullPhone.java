@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Aion Technology LLC
+ * Copyright 2022-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,11 @@
 
 package io.aiontechnology.mentorsuccess.model.validation;
 
-import javax.validation.Constraint;
-import javax.validation.Payload;
-import javax.validation.ReportAsSingleViolation;
-import javax.validation.constraints.Pattern;
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
+import jakarta.validation.ReportAsSingleViolation;
+import jakarta.validation.constraints.Pattern;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 

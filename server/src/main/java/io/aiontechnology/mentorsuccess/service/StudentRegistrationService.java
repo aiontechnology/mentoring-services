@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Aion Technology LLC
+ * Copyright 2022-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,12 +23,14 @@ import io.aiontechnology.mentorsuccess.entity.School;
 import io.aiontechnology.mentorsuccess.entity.SchoolSession;
 import io.aiontechnology.mentorsuccess.entity.Student;
 import io.aiontechnology.mentorsuccess.entity.StudentSchoolSession;
-import io.aiontechnology.mentorsuccess.entity.workflow.StudentInformation;
 import io.aiontechnology.mentorsuccess.entity.workflow.StudentRegistration;
+import io.aiontechnology.mentorsuccess.feature.workflow.process.ProcessIdToSingleTaskFunction;
 import io.aiontechnology.mentorsuccess.model.inbound.InboundInvitation;
 import io.aiontechnology.mentorsuccess.model.inbound.student.InboundStudent;
 import io.aiontechnology.mentorsuccess.model.inbound.student.InboundStudentInformation;
 import io.aiontechnology.mentorsuccess.model.inbound.student.InboundStudentRegistration;
+import io.aiontechnology.mentorsuccess.workflow.FlowableProcessUtilities;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
@@ -39,7 +41,6 @@ import org.flowable.task.api.TaskInfo;
 import org.flowable.task.api.TaskQuery;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -67,10 +68,12 @@ public class StudentRegistrationService {
     private final OneWayMapper<InboundStudentRegistration, InboundStudent> studentRegistrationToStudentMapper;
 
     // Services
-    private final TaskService taskService;
+    private final FlowableProcessUtilities flowableProcessUtilities;
+    private final ProcessIdToSingleTaskFunction flowableTaskUtilities;
     private final RuntimeService runtimeService;
     private final SchoolService schoolService;
     private final StudentService studentService;
+    private final TaskService taskService;
 
     public void cancelRegistration(UUID processId) {
         completeTask(processId, Map.of(
@@ -96,32 +99,6 @@ public class StudentRegistrationService {
                     studentService.updateStudent(student);
 
                     return Pair.of(student, studentSchoolSession);
-                });
-    }
-
-    public Optional<StudentInformation> findStudentInformationWorkflowById(UUID processId) {
-        StudentInformation studentInformation = new StudentInformation();
-        TaskQuery query = taskService.createTaskQuery()
-                .processInstanceId(processId.toString())
-                .includeProcessVariables();
-        return query.list().stream()
-                .findFirst()
-                .map(task -> {
-                    studentInformation.setId(UUID.fromString(task.getProcessInstanceId()));
-                    return task;
-                })
-                .map(TaskInfo::getProcessVariables)
-                .flatMap(variables -> {
-                    UUID schoolId = UUID.fromString((String) variables.get(SCHOOL_ID));
-                    UUID studentId = UUID.fromString((String) variables.get(STUDENT_ID));
-                    School school = schoolService.getSchoolById(schoolId)
-                            .orElseThrow(() -> new NotFoundException("School was not found"));
-                    SchoolSession currentSession = school.getCurrentSession();
-                    return studentService.getStudentById(studentId, currentSession);
-                })
-                .map(student -> {
-                    studentInformation.setStudentName(student.getFullName());
-                    return studentInformation;
                 });
     }
 

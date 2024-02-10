@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Aion Technology LLC
+ * Copyright 2022-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,13 @@
 package io.aiontechnology.mentorsuccess.model.inbound.student;
 
 import io.aiontechnology.mentorsuccess.model.inbound.BaseValidatorTest;
+import jakarta.validation.ConstraintViolation;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import javax.validation.ConstraintViolation;
 import java.net.URI;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -36,19 +36,17 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class InboundStudentTeacherTest extends BaseValidatorTest {
 
-    @Test
-    void testValid() {
-        // set up the fixture
-        InboundStudentTeacher inboundStudentTeacher = InboundStudentTeacher.builder()
-                .withUri(URI.create("http://test.com"))
+    private static Stream<Pair<InboundStudentTeacher, String>> studentTeacherInstanceProvider() {
+        InboundStudentTeacher nullUri = InboundStudentTeacher.builder()
+                .withUri(null)
                 .build();
-
-        // execute the SUT
-        Set<ConstraintViolation<InboundStudentTeacher>> constraintViolations =
-                getValidator().validate(inboundStudentTeacher);
-
-        // validation
-        assertThat(constraintViolations.size()).isEqualTo(0);
+        InboundStudentTeacher commentTooLong = InboundStudentTeacher.builder()
+                .withUri(URI.create("http://test.com"))
+                .withComment(
+                        "123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901") // 501 characters
+                .build();
+        return Stream.of(ImmutablePair.of(nullUri, "{studentteacher.uri.notNull}"),
+                ImmutablePair.of(commentTooLong, "{studentteacher.comment.size}"));
     }
 
     @ParameterizedTest
@@ -65,16 +63,19 @@ public class InboundStudentTeacherTest extends BaseValidatorTest {
         assertThat(constraintViolations.iterator().next().getMessage()).isEqualTo(studentTeacherInstance.getRight());
     }
 
-    private static Stream<Pair<InboundStudentTeacher, String>> studentTeacherInstanceProvider() {
-        InboundStudentTeacher nullUri = InboundStudentTeacher.builder()
-                .withUri(null)
-                .build();
-        InboundStudentTeacher commentTooLong = InboundStudentTeacher.builder()
+    @Test
+    void testValid() {
+        // set up the fixture
+        InboundStudentTeacher inboundStudentTeacher = InboundStudentTeacher.builder()
                 .withUri(URI.create("http://test.com"))
-                .withComment("123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901") // 501 characters
                 .build();
-        return Stream.of(ImmutablePair.of(nullUri, "{studentteacher.uri.notNull}"),
-                ImmutablePair.of(commentTooLong, "{studentteacher.comment.size}"));
+
+        // execute the SUT
+        Set<ConstraintViolation<InboundStudentTeacher>> constraintViolations =
+                getValidator().validate(inboundStudentTeacher);
+
+        // validation
+        assertThat(constraintViolations.size()).isEqualTo(0);
     }
 
 }

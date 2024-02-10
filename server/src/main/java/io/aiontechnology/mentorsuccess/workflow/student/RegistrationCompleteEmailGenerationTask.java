@@ -41,8 +41,6 @@ public class RegistrationCompleteEmailGenerationTask extends EmailGeneratorSuppo
 
     private final UriModelToRoleMapper uriToRoleMapper;
 
-    private final RegistrationCompleteEmailGenerator emailGenerator;
-
     private final TaskUtilities taskUtilities;
 
     @Override
@@ -51,8 +49,8 @@ public class RegistrationCompleteEmailGenerationTask extends EmailGeneratorSuppo
         InboundStudentRegistration studentRegistration = taskUtilities.getRequiredVariable(execution, REGISTRATION,
                 InboundStudentRegistration.class);
         Optional<Person> teacher = getTeacher(studentRegistration).map(SchoolPersonRole::getPerson);
-        return emailGenerator.render(programAdminName, teacher.map(Person::getFullName).orElse(""),
-                studentRegistration);
+        return getGenerationStrategy(execution, RegistrationCompleteEmailGenerator.class)
+                .render(programAdminName, teacher.map(Person::getFullName).orElse(""), studentRegistration);
     }
 
     @Override

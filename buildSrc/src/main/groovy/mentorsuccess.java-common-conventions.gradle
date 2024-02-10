@@ -24,12 +24,15 @@ version = "${version}"
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(18)
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
 jacoco {
-    toolVersion = "0.8.8"
+    toolVersion = "0.8.11"
 }
 
 javadoc.options.addStringOption('Xdoclint:none', '-quiet')
@@ -66,20 +69,20 @@ task copyJar(type: Copy) {
 
 build.dependsOn copyJar
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier 'sources'
-    from sourceSets.main.allSource
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier 'javadoc'
-    from javadoc.destinationDir
-}
-
-artifacts {
-    archives sourcesJar
-    archives javadocJar
-}
+//task sourcesJar(type: Jar, dependsOn: classes) {
+//    classifier 'sources'
+//    from sourceSets.main.allSource
+//}
+//
+//task javadocJar(type: Jar, dependsOn: javadoc) {
+//    classifier 'javadoc'
+//    from javadoc.destinationDir
+//}
+//
+//artifacts {
+//    archives sourcesJar
+//    archives javadocJar
+//}
 
 test {
     useJUnitPlatform()

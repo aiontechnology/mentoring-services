@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Aion Technology LLC
+ * Copyright 2022-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,13 @@
 
 package io.aiontechnology.mentorsuccess.model.inbound;
 
+import jakarta.validation.ConstraintViolation;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import javax.validation.ConstraintViolation;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -34,36 +34,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 1.8.0
  */
 public class InboundPersonnelTest extends BaseValidatorTest {
-
-    @Test
-    void testValid() {
-        // set up the fixture
-        InboundPersonnel inboundPersonnel = InboundPersonnel.builder()
-                .withType(SOCIAL_WORKER)
-                .withFirstName("FIRST")
-                .withLastName("LAST")
-                .build();
-
-        // execute the SUT
-        Set<ConstraintViolation<InboundPersonnel>> constraintViolations = getValidator().validate(inboundPersonnel);
-
-        // validation
-        assertThat(constraintViolations.size()).isEqualTo(0);
-    }
-
-    @ParameterizedTest
-    @MethodSource("personnelInstanceProvider")
-    void testInvalid(Pair<InboundPersonnel, String> personnelInstance) {
-        // set up the fixture
-
-        // execute the SUT
-        Set<ConstraintViolation<InboundPersonnel>> constraintViolations =
-                getValidator().validate(personnelInstance.getLeft());
-
-        // validation
-        assertThat(constraintViolations.size()).isEqualTo(1);
-        assertThat(constraintViolations.iterator().next().getMessage()).isEqualTo(personnelInstance.getRight());
-    }
 
     private static Stream<ImmutablePair<InboundPersonnel, String>> personnelInstanceProvider() {
         InboundPersonnel nullType = InboundPersonnel.builder()
@@ -117,6 +87,36 @@ public class InboundPersonnelTest extends BaseValidatorTest {
                 ImmutablePair.of(invalidEmail, "{personnel.email.invalid}"),
                 ImmutablePair.of(invalidWorkPhone, "{personnel.workPhone.invalid}"),
                 ImmutablePair.of(invalidCellPhone, "{personnel.cellPhone.invalid}"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("personnelInstanceProvider")
+    void testInvalid(Pair<InboundPersonnel, String> personnelInstance) {
+        // set up the fixture
+
+        // execute the SUT
+        Set<ConstraintViolation<InboundPersonnel>> constraintViolations =
+                getValidator().validate(personnelInstance.getLeft());
+
+        // validation
+        assertThat(constraintViolations.size()).isEqualTo(1);
+        assertThat(constraintViolations.iterator().next().getMessage()).isEqualTo(personnelInstance.getRight());
+    }
+
+    @Test
+    void testValid() {
+        // set up the fixture
+        InboundPersonnel inboundPersonnel = InboundPersonnel.builder()
+                .withType(SOCIAL_WORKER)
+                .withFirstName("FIRST")
+                .withLastName("LAST")
+                .build();
+
+        // execute the SUT
+        Set<ConstraintViolation<InboundPersonnel>> constraintViolations = getValidator().validate(inboundPersonnel);
+
+        // validation
+        assertThat(constraintViolations.size()).isEqualTo(0);
     }
 
 }

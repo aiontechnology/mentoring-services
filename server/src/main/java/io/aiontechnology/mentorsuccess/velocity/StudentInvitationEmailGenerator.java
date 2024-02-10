@@ -24,13 +24,11 @@ import org.springframework.stereotype.Service;
 
 import java.io.StringWriter;
 
-@Service
-@RequiredArgsConstructor
 public class StudentInvitationEmailGenerator extends VelocityGenerationStrategySupport {
 
     private static final String TEMPLATE_NAME = "templates/student/invitation-email.vm";
 
-    private final PhoneService phoneService;
+    private final PhoneService phoneService = new PhoneService();
 
     public String render(String parentFirstName, String schoolName, String programAdminName, String programAdminEmail,
             String programAdminPhone, String registrationUri) {

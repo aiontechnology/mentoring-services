@@ -59,6 +59,8 @@ import io.aiontechnology.mentorsuccess.entity.reference.Phonogram;
 import io.aiontechnology.mentorsuccess.entity.reference.Tag;
 import io.aiontechnology.mentorsuccess.entity.workflow.StudentInformation;
 import io.aiontechnology.mentorsuccess.entity.workflow.StudentRegistration;
+import io.aiontechnology.mentorsuccess.feature.workflow.assembler.PostAssessmentWorkflowAssembler;
+import io.aiontechnology.mentorsuccess.feature.workflow.model.PostAssessmentWorkflow;
 import io.aiontechnology.mentorsuccess.model.outbound.student.OutboundContact;
 import io.aiontechnology.mentorsuccess.resource.BookResource;
 import io.aiontechnology.mentorsuccess.resource.GameResource;
@@ -66,6 +68,7 @@ import io.aiontechnology.mentorsuccess.resource.InterestResource;
 import io.aiontechnology.mentorsuccess.resource.MentorResource;
 import io.aiontechnology.mentorsuccess.resource.PersonResource;
 import io.aiontechnology.mentorsuccess.resource.PersonnelResource;
+import io.aiontechnology.mentorsuccess.resource.PostAssessmentWorkflowResource;
 import io.aiontechnology.mentorsuccess.resource.ProgramAdminResource;
 import io.aiontechnology.mentorsuccess.resource.SchoolResource;
 import io.aiontechnology.mentorsuccess.resource.SchoolSessionResource;
@@ -168,6 +171,11 @@ public class AssemblerConfiguration {
     }
 
     @Bean
+    public Assembler<PostAssessmentWorkflow, PostAssessmentWorkflowResource> postAssessmentWorkflowAssembler() {
+        return new PostAssessmentWorkflowAssembler();
+    }
+
+    @Bean
     public Assembler<SchoolPersonRole, ProgramAdminResource> programAdminAssembler(
             PhoneService phoneService) {
         return new ProgramAdminAssembler(phoneService);
@@ -208,15 +216,15 @@ public class AssemblerConfiguration {
     }
 
     @Bean
+    public Assembler<StudentInformation, StudentInformationResource> studentInformationAssembler() {
+        return new StudentInformationAssembler();
+    }
+
+    @Bean
     public Assembler<StudentSchoolSession, StudentMentorResource> studentMentorAssembler(
             Assembler<SchoolPersonRole, MentorResource> mentorAssembler) {
         return new StudentMentorAssembler()
                 .withSubMapper("mentor", mentorAssembler);
-    }
-
-    @Bean
-    public Assembler<StudentInformation, StudentInformationResource> studentInformationAssembler() {
-        return new StudentInformationAssembler();
     }
 
     @Bean

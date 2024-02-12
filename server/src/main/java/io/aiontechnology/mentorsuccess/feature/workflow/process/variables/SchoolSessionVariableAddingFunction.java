@@ -26,6 +26,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import static io.aiontechnology.mentorsuccess.feature.workflow.WorkflowKeys.SCHOOL_SESSION_ID;
+import static io.aiontechnology.mentorsuccess.workflow.RegistrationWorkflowConstants.SCHOOL_EMAIL_TAG;
 
 @Component
 @Slf4j
@@ -34,7 +35,10 @@ public class SchoolSessionVariableAddingFunction implements Function<Optional<Sc
     @Override
     public Map<String, Object> apply(Optional<SchoolSession> schoolSession) {
         var map = new HashedMap<String, Object>();
-        schoolSession.ifPresent(s -> map.put(SCHOOL_SESSION_ID, s.getId().toString()));
+        schoolSession.ifPresent(s -> {
+                map.put(SCHOOL_SESSION_ID, s.getId().toString());
+                map.put(SCHOOL_EMAIL_TAG, s.getSchool().getEmailTag());
+        });
         return map;
     }
 

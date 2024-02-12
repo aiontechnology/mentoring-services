@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Aion Technology LLC
+ * Copyright 2022-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,6 +61,7 @@ public class SchoolAssembler extends AssemblerSupport<School, SchoolResource> {
                     resource.setPhone(phoneService.format(school.getPhone()));
                     resource.setDistrict(school.getDistrict());
                     resource.setIsPrivate(school.getIsPrivate());
+                    resource.setEmailTag(school.getEmailTag());
                     resource.setCurrentSession(schoolSessionAssembler.map(school.getCurrentSession()).orElse(null));
                     return resource;
                 });

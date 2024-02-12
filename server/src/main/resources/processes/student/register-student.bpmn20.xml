@@ -40,6 +40,7 @@
                 <flowable:in sourceExpression="io.aiontechnology.mentorsuccess.velocity.StudentInvitationEmailGenerator"
                              target="generationStrategyClassName"/>
                 <flowable:in source="schoolId" target="schoolId"/>
+                <flowable:in source="schoolEmailTag" target="schoolEmailTag"/>
                 <flowable:in source="invitation" target="invitation"/>
                 <flowable:out source="registration" target="registration"/>
                 <flowable:out source="newStudent" target="newStudent"/>
@@ -53,6 +54,7 @@
                 <flowable:in sourceExpression="io.aiontechnology.mentorsuccess.velocity.RegistrationCompleteEmailGenerator"
                              target="generationStrategyClassName"/>
                 <flowable:in source="schoolId" target="schoolId"/>
+                <flowable:in source="schoolEmailTag" target="schoolEmailTag"/>
                 <flowable:in source="newStudent" target="newStudent"/>
                 <flowable:in source="registration" target="registration"/>
                 <flowable:out source="teacherId" target="teacherId"/>
@@ -83,6 +85,7 @@
                 <flowable:in sourceExpression="io.aiontechnology.mentorsuccess.velocity.StudentInvitationEmailGenerator"
                              target="generationStrategyClassName"/>
                 <flowable:in source="schoolId" target="schoolId"/>
+                <flowable:in source="schoolEmailTag" target="schoolEmailTag"/>
                 <flowable:in source="invitation" target="invitation"/>
                 <flowable:out source="registration" target="registration"/>
                 <flowable:out source="newStudent" target="newStudent"/>
@@ -96,6 +99,7 @@
                 <flowable:in sourceExpression="io.aiontechnology.mentorsuccess.velocity.RegistrationCompleteEmailGenerator"
                              target="generationStrategyClassName"/>
                 <flowable:in source="schoolId" target="schoolId"/>
+                <flowable:in source="schoolEmailTag" target="schoolEmailTag"/>
                 <flowable:in source="newStudent" target="newStudent"/>
                 <flowable:in source="registration" target="registration"/>
                 <flowable:out source="teacherId" target="teacherId"/>
@@ -141,6 +145,9 @@
                 <flowable:field name="to">
                     <flowable:expression><![CDATA[${email.to}]]></flowable:expression>
                 </flowable:field>
+                <flowable:field name="cc">
+                    <flowable:expression><![CDATA[${email.cc}]]></flowable:expression>
+                </flowable:field>
                 <flowable:field name="from">
                     <flowable:expression><![CDATA[${email.from}]]></flowable:expression>
                 </flowable:field>
@@ -174,6 +181,9 @@
             <extensionElements>
                 <flowable:field name="to">
                     <flowable:expression><![CDATA[${email.to}]]></flowable:expression>
+                </flowable:field>
+                <flowable:field name="cc">
+                    <flowable:expression><![CDATA[${email.cc}]]></flowable:expression>
                 </flowable:field>
                 <flowable:field name="from">
                     <flowable:expression><![CDATA[${email.from}]]></flowable:expression>

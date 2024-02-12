@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Aion Technology LLC
+ * Copyright 2023-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 
 package io.aiontechnology.mentorsuccess.workflow.teacher;
 
+import io.aiontechnology.mentorsuccess.util.EmailAddress;
 import io.aiontechnology.mentorsuccess.util.UriBuilder;
 import io.aiontechnology.mentorsuccess.velocity.TeacherEmailGeneratorSupport;
 import io.aiontechnology.mentorsuccess.workflow.EmailGeneratorSupport;
 import io.aiontechnology.mentorsuccess.workflow.TaskUtilities;
-import lombok.RequiredArgsConstructor;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.springframework.stereotype.Service;
 
@@ -29,19 +29,19 @@ import java.util.Optional;
 import static io.aiontechnology.mentorsuccess.workflow.RegistrationWorkflowConstants.REGISTRATION_BASE;
 
 @Service
-@RequiredArgsConstructor
 public class InformationEmailGenerationTask extends EmailGeneratorSupport {
 
-    // Other
-    private final TaskUtilities taskUtilities;
+    public InformationEmailGenerationTask(TaskUtilities taskUtilities) {
+        super(taskUtilities);
+    }
 
     @Override
     protected String getBody(DelegateExecution execution) {
         return getGenerationStrategy(execution, TeacherEmailGeneratorSupport.class).render(
-                taskUtilities.getTeacherFullName(execution).orElse(""),
-                taskUtilities.getStudentFullName(execution).orElse(""),
-                taskUtilities.getProgramAdminFullName(execution),
-                taskUtilities.getProgramAdminEmail(execution),
+                getTaskUtilities().getTeacherFullName(execution).orElse(""),
+                getTaskUtilities().getStudentFullName(execution).orElse(""),
+                getTaskUtilities().getProgramAdminFullName(execution),
+                getTaskUtilities().getProgramAdminEmail(execution),
                 createInformationUri(execution).orElse(""),
                 createAssessmentUri(execution).orElse(""));
     }
@@ -58,32 +58,37 @@ public class InformationEmailGenerationTask extends EmailGeneratorSupport {
 
     @Override
     protected String getTo(DelegateExecution execution) {
+        TaskUtilities taskUtilities = getTaskUtilities();
         return taskUtilities.getTeacherEmailAddress(execution)
-                .orElseThrow(() -> new IllegalStateException("Unable to find teacher email address"));
-    }
-
-    private Optional<String> createInformationUri(DelegateExecution execution) {
-        String registrationBase = taskUtilities.getRequiredVariable(execution, REGISTRATION_BASE, String.class);
-        return taskUtilities.getStudent(execution)
-                .map(student -> new UriBuilder(registrationBase)
-                        .withPathAddition("schools")
-                        .withPathAddition(student.getSchool().getId().toString())
-                        .withPathAddition("students")
-                        .withPathAddition(student.getId().toString())
-                        .withPathAddition("information")
-                        .withPathAddition(execution.getProcessInstanceId())
-                        .build());
+                .map(EmailAddress::builder)
+                .map(builder -> builder.withName(taskUtilities.getTeacherFullName(execution)))
+                .map(EmailAddress.EmailAddressBuilder::build)
+                .map(Object::toString)
+                .orElseThrow(() -> new IllegalStateException("Unable to find the teacher's email address"));
     }
 
     private Optional<String> createAssessmentUri(DelegateExecution execution) {
-        String registrationBase = taskUtilities.getRequiredVariable(execution, REGISTRATION_BASE, String.class);
-        return taskUtilities.getStudent(execution)
+        String registrationBase = getTaskUtilities().getRequiredVariable(execution, REGISTRATION_BASE, String.class);
+        return getTaskUtilities().getStudent(execution)
                 .map(student -> new UriBuilder(registrationBase)
                         .withPathAddition("schools")
                         .withPathAddition(student.getSchool().getId().toString())
                         .withPathAddition("students")
                         .withPathAddition(student.getId().toString())
                         .withPathAddition("assessment")
+                        .withPathAddition(execution.getProcessInstanceId())
+                        .build());
+    }
+
+    private Optional<String> createInformationUri(DelegateExecution execution) {
+        String registrationBase = getTaskUtilities().getRequiredVariable(execution, REGISTRATION_BASE, String.class);
+        return getTaskUtilities().getStudent(execution)
+                .map(student -> new UriBuilder(registrationBase)
+                        .withPathAddition("schools")
+                        .withPathAddition(student.getSchool().getId().toString())
+                        .withPathAddition("students")
+                        .withPathAddition(student.getId().toString())
+                        .withPathAddition("information")
                         .withPathAddition(execution.getProcessInstanceId())
                         .build());
     }

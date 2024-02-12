@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 Aion Technology LLC
+ * Copyright 2020-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,7 @@ public class SchoolServiceTest {
     private static final String DISTRICT = "DISTRICT";
     private static final Boolean IS_PRIVATE = Boolean.TRUE;
     private static final Boolean IS_ACTIVE = Boolean.TRUE;
+    private static final String EMAIL_TAG = "TAG";
     private static final Collection<SchoolPersonRole> ROLES = Collections.EMPTY_LIST;
     private static final Collection<Student> STUDENTS = Collections.EMPTY_LIST;
     private static final Collection<Book> BOOKS = Collections.EMPTY_LIST;
@@ -190,7 +191,7 @@ public class SchoolServiceTest {
 
     private School generateSchool(UUID id) {
         return new School(id, NAME, STREET1, STREET2, CITY, STATE, ZIP, PHONE, DISTRICT, IS_PRIVATE, IS_ACTIVE,
-                ROLES, SESSIONS, null, STUDENTS, BOOKS, GAMES);
+                EMAIL_TAG, ROLES, SESSIONS, null, STUDENTS, BOOKS, GAMES);
     }
 
 }

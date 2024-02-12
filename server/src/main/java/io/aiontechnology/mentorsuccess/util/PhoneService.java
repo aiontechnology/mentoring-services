@@ -1,11 +1,11 @@
 /*
- * Copyright 2020 Aion Technology LLC
+ * Copyright 2020-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,6 +30,28 @@ import java.util.Optional;
 public class PhoneService {
 
     /**
+     * Format a phone number for the UI. xxxyyyzzzz -{@literal >} (xxx) yyy-zzzz.
+     *
+     * @param phoneNumber The phone number to format
+     * @return The formatted phone number.
+     */
+    public String format(String phoneNumber) {
+        return format(Optional.ofNullable(phoneNumber));
+    }
+
+    public String format(Optional<String> phoneNumber) {
+        return phoneNumber
+                .map(pn -> {
+                    var normalized = normalize(pn);
+                    if (!normalized.matches("\\d{10}")) {
+                        throw new IllegalArgumentException("Unable to normalize phone number: " + pn);
+                    }
+                    return normalized.replaceFirst("(\\d{3})(\\d{3})(\\d+)", "($1) $2-$3");
+                })
+                .orElse(null);
+    }
+
+    /**
      * Normalize a phone number by removing non-numeric symbols. (xxx) yyy-zzzz -{@literal >} xxxyyyzzzz.
      *
      * @param phoneNumber The phone number to normalize.
@@ -41,18 +63,6 @@ public class PhoneService {
                         .replace(")", "")
                         .replace("-", "")
                         .replace(" ", ""))
-                .orElse(null);
-    }
-
-    /**
-     * Formate a phone number for the UI. xxxyyyzzzz -{@literal >} (xxx) yyy-zzzz.
-     *
-     * @param phoneNumber The phone number to format
-     * @return The formatted phone number.
-     */
-    public String format(String phoneNumber) {
-        return Optional.ofNullable(phoneNumber)
-                .map(pn -> pn.replaceFirst("(\\d{3})(\\d{3})(\\d+)", "($1) $2-$3"))
                 .orElse(null);
     }
 

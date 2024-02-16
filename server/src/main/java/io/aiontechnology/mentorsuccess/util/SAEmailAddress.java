@@ -33,7 +33,7 @@ public class SAEmailAddress extends EmailAddress {
         private final String AION_DOMAIN = "aiontechnology.io";
         private final String AION_ACCOUNT = "dev";
         private final String AION_NAME = "Aion Technology";
-        private final String SA_DOMAIN = "mentorsuccesskids.com";
+        private final String SA_DOMAIN = "hisheartfoundation.org";
         private final String SA_ACCOUNT = "mentorsuccess";
         private final String SA_NAME = "MentorSuccess™ System Administrator";
         private Optional<String> tag = Optional.empty();

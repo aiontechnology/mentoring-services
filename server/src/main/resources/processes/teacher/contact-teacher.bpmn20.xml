@@ -53,6 +53,9 @@
                 <flowable:field name="to">
                     <flowable:expression><![CDATA[${email.to}]]></flowable:expression>
                 </flowable:field>
+                <flowable:field name="cc">
+                    <flowable:expression><![CDATA[${email.cc}]]></flowable:expression>
+                </flowable:field>
                 <flowable:field name="from">
                     <flowable:expression><![CDATA[${email.from}]]></flowable:expression>
                 </flowable:field>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Aion Technology LLC
+ * Copyright 2023-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,8 @@ import io.aiontechnology.mentorsuccess.entity.Person;
 import io.aiontechnology.mentorsuccess.entity.SchoolPersonRole;
 import io.aiontechnology.mentorsuccess.model.inbound.student.InboundStudentRegistration;
 import io.aiontechnology.mentorsuccess.velocity.RegistrationCompleteEmailGenerator;
-import io.aiontechnology.mentorsuccess.workflow.EmailGeneratorSupport;
+import io.aiontechnology.mentorsuccess.workflow.ProgramAdministratorEmailGeneratorSupport;
 import io.aiontechnology.mentorsuccess.workflow.TaskUtilities;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.springframework.stereotype.Service;
@@ -36,17 +35,19 @@ import static io.aiontechnology.mentorsuccess.workflow.RegistrationWorkflowConst
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
-public class RegistrationCompleteEmailGenerationTask extends EmailGeneratorSupport {
+public class RegistrationCompleteEmailGenerationTask extends ProgramAdministratorEmailGeneratorSupport {
 
     private final UriModelToRoleMapper uriToRoleMapper;
 
-    private final TaskUtilities taskUtilities;
+    public RegistrationCompleteEmailGenerationTask(TaskUtilities taskUtilities, UriModelToRoleMapper uriToRoleMapper) {
+        super(taskUtilities);
+        this.uriToRoleMapper = uriToRoleMapper;
+    }
 
     @Override
     protected String getBody(DelegateExecution execution) {
-        String programAdminName = taskUtilities.getProgramAdminFullName(execution);
-        InboundStudentRegistration studentRegistration = taskUtilities.getRequiredVariable(execution, REGISTRATION,
+        String programAdminName = getTaskUtilities().getProgramAdminFullName(execution);
+        InboundStudentRegistration studentRegistration = getTaskUtilities().getRequiredVariable(execution, REGISTRATION,
                 InboundStudentRegistration.class);
         Optional<Person> teacher = getTeacher(studentRegistration).map(SchoolPersonRole::getPerson);
         return getGenerationStrategy(execution, RegistrationCompleteEmailGenerator.class)
@@ -60,19 +61,14 @@ public class RegistrationCompleteEmailGenerationTask extends EmailGeneratorSuppo
 
     @Override
     protected String getSubject(DelegateExecution execution) {
-        InboundStudentRegistration studentRegistration = taskUtilities.getRequiredVariable(execution, REGISTRATION,
+        InboundStudentRegistration studentRegistration = getTaskUtilities().getRequiredVariable(execution, REGISTRATION,
                 InboundStudentRegistration.class);
         return "Completed Registration: " + studentRegistration.getStudentFullName();
     }
 
     @Override
-    protected String getTo(DelegateExecution execution) {
-        return taskUtilities.getProgramAdminEmail(execution);
-    }
-
-    @Override
     protected void setAdditionalVariables(DelegateExecution execution) {
-        InboundStudentRegistration studentRegistration = taskUtilities.getRequiredVariable(execution, REGISTRATION,
+        InboundStudentRegistration studentRegistration = getTaskUtilities().getRequiredVariable(execution, REGISTRATION,
                 InboundStudentRegistration.class);
         Optional<SchoolPersonRole> teacher = getTeacher(studentRegistration);
         execution.setVariable(TEACHER_ID, teacher

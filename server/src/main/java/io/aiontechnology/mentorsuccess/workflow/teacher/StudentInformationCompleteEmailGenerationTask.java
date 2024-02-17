@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Aion Technology LLC
+ * Copyright 2023-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,28 +18,24 @@ package io.aiontechnology.mentorsuccess.workflow.teacher;
 
 import io.aiontechnology.mentorsuccess.model.inbound.student.InboundStudentInformation;
 import io.aiontechnology.mentorsuccess.velocity.TeacherInvitationCompleteEmailGenerator;
-import io.aiontechnology.mentorsuccess.workflow.EmailGeneratorSupport;
+import io.aiontechnology.mentorsuccess.workflow.ProgramAdministratorEmailGeneratorSupport;
 import io.aiontechnology.mentorsuccess.workflow.TaskUtilities;
-import lombok.RequiredArgsConstructor;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-
-import static io.aiontechnology.mentorsuccess.workflow.RegistrationWorkflowConstants.SA_EMAIL_ADDRESS;
-
 @Service
-@RequiredArgsConstructor
-public class StudentInformationCompleteEmailGenerationTask extends EmailGeneratorSupport {
+public class StudentInformationCompleteEmailGenerationTask extends ProgramAdministratorEmailGeneratorSupport {
 
-    private final TaskUtilities taskUtilities;
+    public StudentInformationCompleteEmailGenerationTask(TaskUtilities taskUtilities) {
+        super(taskUtilities);
+    }
 
     @Override
     protected String getBody(DelegateExecution execution) {
-        String programAdminName = taskUtilities.getProgramAdminFullName(execution);
-        String studentName = taskUtilities.getStudentFullName(execution).orElse("");
+        String programAdminName = getTaskUtilities().getProgramAdminFullName(execution);
+        String studentName = getTaskUtilities().getStudentFullName(execution).orElse("");
         InboundStudentInformation studentInformation =
-                taskUtilities.getInboundStudentInformation(execution).orElseThrow();
+                getTaskUtilities().getInboundStudentInformation(execution).orElseThrow();
         return getGenerationStrategy(execution, TeacherInvitationCompleteEmailGenerator.class)
                 .render(programAdminName, studentName, studentInformation);
     }
@@ -51,12 +47,7 @@ public class StudentInformationCompleteEmailGenerationTask extends EmailGenerato
 
     @Override
     protected String getSubject(DelegateExecution execution) {
-        return "Student Information Received: " + taskUtilities.getStudentFullName(execution).orElse("");
-    }
-
-    @Override
-    protected String getTo(DelegateExecution execution) {
-        return String.join(", ", Arrays.asList(SA_EMAIL_ADDRESS, taskUtilities.getProgramAdminEmail(execution)));
+        return "Student Information Received: " + getTaskUtilities().getStudentFullName(execution).orElse("");
     }
 
 }

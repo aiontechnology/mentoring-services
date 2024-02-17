@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Aion Technology LLC
+ * Copyright 2023-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package io.aiontechnology.mentorsuccess.workflow;
 
+import io.aiontechnology.mentorsuccess.util.SAEmailAddress;
 import io.aiontechnology.mentorsuccess.velocity.VelocityGenerationStrategy;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -27,9 +28,15 @@ import static io.aiontechnology.mentorsuccess.workflow.RegistrationWorkflowConst
 
 public abstract class EmailGeneratorSupport implements JavaDelegate {
 
-    protected static final String DEFAULT_FROM_EMAIL_ADDRESS = "do-not-reply@mentorsuccesskids.com";
+    public static final String DEFAULT_FROM_EMAIL_ADDRESS = "MentorSuccess™ <mentorsuccess@hisheartfoundation.org>";
 
     private Expression generationStrategyClassName;
+
+    private TaskUtilities taskUtilities;
+
+    protected EmailGeneratorSupport(TaskUtilities taskUtilities) {
+        this.taskUtilities = taskUtilities;
+    }
 
     @Override
     public final void execute(DelegateExecution execution) {
@@ -39,9 +46,18 @@ public abstract class EmailGeneratorSupport implements JavaDelegate {
 
     protected abstract String getBody(DelegateExecution execution);
 
+    protected String getCC(DelegateExecution execution) {
+        var schoolEmailTag = taskUtilities.getSchoolEmailTag(execution);
+        return SAEmailAddress.builder()
+                .withTag(schoolEmailTag)
+                .build()
+                .toString();
+    }
+
     protected abstract String getFrom(DelegateExecution execution);
 
-    protected <T extends VelocityGenerationStrategy> T getGenerationStrategy(DelegateExecution execution, Class<T> clazz) {
+    protected <T extends VelocityGenerationStrategy> T getGenerationStrategy(DelegateExecution execution,
+            Class<T> clazz) {
         String name = (String) generationStrategyClassName.getValue(execution);
         try {
             Class generationClass = Class.forName(name);
@@ -54,6 +70,10 @@ public abstract class EmailGeneratorSupport implements JavaDelegate {
 
     protected abstract String getSubject(DelegateExecution execution);
 
+    protected TaskUtilities getTaskUtilities() {
+        return taskUtilities;
+    }
+
     protected abstract String getTo(DelegateExecution execution);
 
     protected void setAdditionalVariables(DelegateExecution execution) {
@@ -63,6 +83,7 @@ public abstract class EmailGeneratorSupport implements JavaDelegate {
         return Map.of(
                 "subject", getSubject(execution),
                 "to", getTo(execution),
+                "cc", getCC(execution),
                 "from", getFrom(execution),
                 "body", getBody(execution)
         );

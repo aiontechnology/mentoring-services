@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Aion Technology LLC
+ * Copyright 2023-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 import static io.aiontechnology.mentorsuccess.feature.workflow.WorkflowKeys.STUDENT_ASSESSMENT;
 import static io.aiontechnology.mentorsuccess.model.enumeration.RoleType.PROGRAM_ADMIN;
 import static io.aiontechnology.mentorsuccess.model.enumeration.RoleType.TEACHER;
+import static io.aiontechnology.mentorsuccess.workflow.RegistrationWorkflowConstants.SCHOOL_EMAIL_TAG;
 import static io.aiontechnology.mentorsuccess.workflow.RegistrationWorkflowConstants.SCHOOL_ID;
 import static io.aiontechnology.mentorsuccess.workflow.RegistrationWorkflowConstants.STUDENT_ID;
 import static io.aiontechnology.mentorsuccess.workflow.RegistrationWorkflowConstants.STUDENT_INFORMATION;
@@ -65,6 +66,11 @@ public class TaskUtilities {
                 .orElseThrow(() -> new IllegalStateException("Unable to find program admin email address"));
     }
 
+    public Optional<String> getProgramAdminPhoneNumber(DelegateExecution execution) {
+        return getProgramAdmin(execution)
+                .map(Person::getCellPhone);
+    }
+
     public String getProgramAdminFullName(DelegateExecution execution) {
         return getProgramAdmin(execution)
                 .map(Person::getFullName)
@@ -90,6 +96,10 @@ public class TaskUtilities {
         return schoolService.getSchoolById(schoolId);
     }
 
+    public Optional<String> getSchoolEmailTag(DelegateExecution execution) {
+        return Optional.ofNullable(execution.getVariable(SCHOOL_EMAIL_TAG, String.class));
+    }
+
     public Optional<Student> getStudent(DelegateExecution execution) {
         return Optional.ofNullable(execution.getVariable(STUDENT_ID, String.class))
                 .map(UUID::fromString)
@@ -109,15 +119,18 @@ public class TaskUtilities {
                         .findFirst());
     }
 
-    public Optional<String> getTeacherEmailAddress(DelegateExecution execution) {
+    public Optional<Person> getTeacherPerson(DelegateExecution execution) {
         return getTeacher(execution)
-                .map(SchoolPersonRole::getPerson)
+                .map(SchoolPersonRole::getPerson);
+    }
+
+    public Optional<String> getTeacherEmailAddress(DelegateExecution execution) {
+        return getTeacherPerson(execution)
                 .map(Person::getEmail);
     }
 
     public Optional<String> getTeacherFullName(DelegateExecution execution) {
-        return getTeacher(execution)
-                .map(SchoolPersonRole::getPerson)
+        return getTeacherPerson(execution)
                 .map(Person::getFullName);
     }
 

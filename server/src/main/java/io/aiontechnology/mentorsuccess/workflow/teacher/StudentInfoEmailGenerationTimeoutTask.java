@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Aion Technology LLC
+ * Copyright 2023-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,23 +17,23 @@
 package io.aiontechnology.mentorsuccess.workflow.teacher;
 
 import io.aiontechnology.mentorsuccess.velocity.StudentInfoTimeoutEmailGenerator;
-import io.aiontechnology.mentorsuccess.workflow.EmailGeneratorSupport;
+import io.aiontechnology.mentorsuccess.workflow.ProgramAdministratorEmailGeneratorSupport;
 import io.aiontechnology.mentorsuccess.workflow.TaskUtilities;
-import lombok.RequiredArgsConstructor;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
-public class StudentInfoEmailGenerationTimeoutTask extends EmailGeneratorSupport {
+public class StudentInfoEmailGenerationTimeoutTask extends ProgramAdministratorEmailGeneratorSupport {
 
-    private final TaskUtilities taskUtilities;
+    public StudentInfoEmailGenerationTimeoutTask(TaskUtilities taskUtilities) {
+        super(taskUtilities);
+    }
 
     @Override
     protected String getBody(DelegateExecution execution) {
-        String programAdminName = taskUtilities.getProgramAdminFullName(execution);
-        String teacherName = taskUtilities.getTeacherFullName(execution).orElseThrow();
-        String studentName = taskUtilities.getStudentFullName(execution).orElseThrow();
+        String programAdminName = getTaskUtilities().getProgramAdminFullName(execution);
+        String teacherName = getTaskUtilities().getTeacherFullName(execution).orElseThrow();
+        String studentName = getTaskUtilities().getStudentFullName(execution).orElseThrow();
         return getGenerationStrategy(execution, StudentInfoTimeoutEmailGenerator.class)
                 .render(programAdminName, teacherName, studentName);
     }
@@ -45,13 +45,8 @@ public class StudentInfoEmailGenerationTimeoutTask extends EmailGeneratorSupport
 
     @Override
     protected String getSubject(DelegateExecution execution) {
-        String studentName = taskUtilities.getStudentFullName(execution).orElse("");
+        String studentName = getTaskUtilities().getStudentFullName(execution).orElse("");
         return "Student information request timed out for " + studentName;
-    }
-
-    @Override
-    protected String getTo(DelegateExecution execution) {
-        return taskUtilities.getProgramAdminEmail(execution);
     }
 
 }

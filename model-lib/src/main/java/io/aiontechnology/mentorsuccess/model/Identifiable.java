@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Aion Technology LLC
+ * Copyright 2022-2024 Aion Technology LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 package io.aiontechnology.mentorsuccess.model;
 
+import java.util.Objects;
+
 /**
  * @author Whitney Hunter
  * @since 1.8.0
@@ -24,5 +26,13 @@ package io.aiontechnology.mentorsuccess.model;
 public interface Identifiable<T> {
 
     T getId();
+
+    default String getRequiredIdString(String message) {
+        return Objects.requireNonNull(getId(), message).toString();
+    }
+
+    default String getRequiredIdString() {
+        return getRequiredIdString("A required ID is missing");
+    }
 
 }

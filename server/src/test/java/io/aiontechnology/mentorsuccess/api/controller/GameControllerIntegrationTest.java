@@ -108,8 +108,8 @@ public class GameControllerIntegrationTest {
         InboundGame inboundGame = InboundGame.builder()
                 .withName(
                         "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901")
-                .withGrade1(7)
-                .withGrade2(7)
+                .withGrade1(13)
+                .withGrade2(13)
                 .withLocation(OFFLINE)
                 .build();
 
@@ -128,8 +128,8 @@ public class GameControllerIntegrationTest {
                 .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
                 .andExpect(jsonPath("$.error.length()", is(3)))
                 .andExpect(jsonPath("$.error.name", is("The name of a game can not be longer than 100 characters")))
-                .andExpect(jsonPath("$.error.grade1", is("A grade level must be between 1st and 6th")))
-                .andExpect(jsonPath("$.error.grade2", is("A grade level must be between 1st and 6th")))
+                .andExpect(jsonPath("$.error.grade1", is("A grade level must be between 1st and 12th")))
+                .andExpect(jsonPath("$.error.grade2", is("A grade level must be between 1st and 12th")))
                 .andExpect(jsonPath("$.message", is("Validation failed")))
                 .andExpect(jsonPath("$.path", is("/api/v1/games")));
     }

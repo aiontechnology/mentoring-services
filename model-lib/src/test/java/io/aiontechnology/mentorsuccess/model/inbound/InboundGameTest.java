@@ -78,8 +78,8 @@ public class InboundGameTest extends BaseValidatorTest {
         // set up the fixture
         InboundGame gradesTooSmall = InboundGame.builder()
                 .withName("NAME")
-                .withGrade1(7)
-                .withGrade2(7)
+                .withGrade1(13)
+                .withGrade2(13)
                 .withLocation(OFFLINE)
                 .build();
 

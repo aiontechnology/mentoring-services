@@ -126,7 +126,7 @@ public class BookControllerIntegrationTest {
                 .andExpect(jsonPath("$.error.length()", is(4)))
                 .andExpect(jsonPath("$.error.title", is("The title of a book can not be longer than 100 characters")))
                 .andExpect(jsonPath("$.error.author", is("The book's author can not be longer than 30 characters")))
-                .andExpect(jsonPath("$.error.gradeLevel", is("A grade level must be between 1st and 6th")))
+                .andExpect(jsonPath("$.error.gradeLevel", is("A grade level must be between 1st and 12th")))
                 .andExpect(jsonPath("$.error.location", is("A location is required for a book")))
                 .andExpect(jsonPath("$.message", is("Validation failed")))
                 .andExpect(jsonPath("$.path", is("/api/v1/books")));

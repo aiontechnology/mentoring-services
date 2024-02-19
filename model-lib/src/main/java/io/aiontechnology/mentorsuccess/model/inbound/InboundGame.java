@@ -54,13 +54,13 @@ public class InboundGame implements GradeRangeHolder {
     /** The game's starting grade level. */
     @NotNull(message = "{game.grade1.notNull}")
     @Min(value = 1, message = "{game.grade1.invalid}")
-    @Max(value = 6, message = "{game.grade1.invalid}")
+    @Max(value = 12, message = "{game.grade1.invalid}")
     Integer grade1;
 
     /** The game's ending grade level. */
     @NotNull(message = "{game.grade2.notNull}")
     @Min(value = 1, message = "{game.grade2.invalid}")
-    @Max(value = 6, message = "{game.grade2.invalid}")
+    @Max(value = 12, message = "{game.grade2.invalid}")
     Integer grade2;
 
     @NotNull(message = "{game.location.notNull}")

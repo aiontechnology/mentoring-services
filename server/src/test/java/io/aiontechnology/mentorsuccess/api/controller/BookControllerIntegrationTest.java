@@ -107,7 +107,7 @@ public class BookControllerIntegrationTest {
                 .withTitle(
                         "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901")
                 .withAuthor("1234567890123456789012345678901")
-                .withGradeLevel(7)
+                .withGradeLevel(13)
                 .build();
 
         // execute the SUT

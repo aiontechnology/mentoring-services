@@ -55,7 +55,7 @@ public class InboundBook {
     /** The book's grade level. */
     @NotNull(message = "{book.gradeLevel.notNull}")
     @Min(value = 1, message = "{book.gradeLevel.invalid}")
-    @Max(value = 6, message = "{book.gradeLevel.invalid}")
+    @Max(value = 12, message = "{book.gradeLevel.invalid}")
     Integer gradeLevel;
 
     @NotNull(message = "{book.location.notNull}")

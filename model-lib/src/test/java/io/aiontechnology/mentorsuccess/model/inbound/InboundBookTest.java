@@ -66,7 +66,7 @@ public class InboundBookTest extends BaseValidatorTest {
         InboundBook gradeTooLarge = InboundBook.builder()
                 .withTitle("TITLE")
                 .withLocation(OFFLINE)
-                .withGradeLevel(7)
+                .withGradeLevel(13)
                 .build();
         InboundBook nullLocation = InboundBook.builder()
                 .withTitle("TITLE")

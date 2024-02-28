@@ -163,14 +163,15 @@
                 #end
             </td>
         </tr>
-        <tr>
-            <td>Preferred Session</td>
-            <td>
-                #if($registration.preferredSession)
-                    ${registration.preferredSession}
-                #end
-            </td>
-        </tr>
+## MS-886 Removed from UI only. API Still supports this
+##        <tr>
+##            <td>Preferred Session</td>
+##            <td>
+##                #if($registration.preferredSession)
+##                    ${registration.preferredSession}
+##                #end
+##            </td>
+##        </tr>
         <tr>
             <td>Emergency Contact First Name</td>
             <td>

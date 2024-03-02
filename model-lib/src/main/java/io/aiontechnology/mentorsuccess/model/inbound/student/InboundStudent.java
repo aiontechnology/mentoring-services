@@ -101,4 +101,7 @@ public class InboundStudent implements Serializable {
     @Valid
     Collection<InboundContact> contacts;
 
+    @NotNull
+    String baseUri;
+
 }

@@ -29,6 +29,7 @@ import io.aiontechnology.mentorsuccess.model.outbound.student.OutboundStudent;
 import io.aiontechnology.mentorsuccess.resource.StudentResource;
 import io.aiontechnology.mentorsuccess.service.SchoolService;
 import io.aiontechnology.mentorsuccess.service.SchoolSessionService;
+import io.aiontechnology.mentorsuccess.service.StudentRegistrationService;
 import io.aiontechnology.mentorsuccess.service.StudentSchoolSessionService;
 import io.aiontechnology.mentorsuccess.service.StudentService;
 import jakarta.transaction.Transactional;
@@ -56,6 +57,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static io.aiontechnology.mentorsuccess.workflow.RegistrationWorkflowConstants.REGISTRATION_TIMEOUT_VALUE;
 import static java.util.Objects.requireNonNull;
 import static org.springframework.http.HttpStatus.CREATED;
 
@@ -83,6 +85,7 @@ public class StudentController {
     // Services
     private final SchoolService schoolService;
     private final SchoolSessionService schoolSessionService;
+    private final StudentRegistrationService studentRegistrationService;
     private final StudentSchoolSessionService studentSchoolSessionService;
     private final StudentService studentService;
 
@@ -117,6 +120,10 @@ public class StudentController {
         student.addStudentSession(studentSchoolSession);
         school.addStudent(student);
         studentService.updateStudent(student);
+
+        studentRegistrationService.startStudentInformationProcess(school, student, inboundStudent.getBaseUri(),
+                REGISTRATION_TIMEOUT_VALUE);
+
         return studentAssembler.map(student).orElse(null);
     }
 

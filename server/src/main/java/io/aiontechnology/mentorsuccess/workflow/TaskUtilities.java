@@ -32,8 +32,10 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static io.aiontechnology.mentorsuccess.feature.workflow.WorkflowKeys.STUDENT_ASSESSMENT;
 import static io.aiontechnology.mentorsuccess.model.enumeration.RoleType.PROGRAM_ADMIN;
@@ -62,19 +64,28 @@ public class TaskUtilities {
 
     public String getProgramAdminEmail(DelegateExecution execution) {
         return getProgramAdmin(execution)
+                .findFirst()
                 .map(Person::getEmail)
                 .orElseThrow(() -> new IllegalStateException("Unable to find program admin email address"));
     }
 
-    public Optional<String> getProgramAdminPhoneNumber(DelegateExecution execution) {
+    public Set<String> getProgramAdminEmails(DelegateExecution execution) {
         return getProgramAdmin(execution)
-                .map(Person::getCellPhone);
+                .map(Person::getEmail)
+                .collect(Collectors.toSet());
     }
 
     public String getProgramAdminFullName(DelegateExecution execution) {
         return getProgramAdmin(execution)
+                .findFirst()
                 .map(Person::getFullName)
                 .orElseThrow(() -> new IllegalStateException("Unable to find program admin name"));
+    }
+
+    public Optional<String> getProgramAdminPhoneNumber(DelegateExecution execution) {
+        return getProgramAdmin(execution)
+                .findFirst()
+                .map(Person::getCellPhone);
     }
 
     public <T> T getRequiredVariable(DelegateExecution execution, String variableName, Class<T> clazz) {
@@ -119,11 +130,6 @@ public class TaskUtilities {
                         .findFirst());
     }
 
-    public Optional<Person> getTeacherPerson(DelegateExecution execution) {
-        return getTeacher(execution)
-                .map(SchoolPersonRole::getPerson);
-    }
-
     public Optional<String> getTeacherEmailAddress(DelegateExecution execution) {
         return getTeacherPerson(execution)
                 .map(Person::getEmail);
@@ -132,6 +138,11 @@ public class TaskUtilities {
     public Optional<String> getTeacherFullName(DelegateExecution execution) {
         return getTeacherPerson(execution)
                 .map(Person::getFullName);
+    }
+
+    public Optional<Person> getTeacherPerson(DelegateExecution execution) {
+        return getTeacher(execution)
+                .map(SchoolPersonRole::getPerson);
     }
 
     private Collection<Person> getPeopleInRole(DelegateExecution execution, RoleType type) {
@@ -146,10 +157,9 @@ public class TaskUtilities {
      * @param execution The context from which the schoolId variable should be found.
      * @return The school's program administrator.
      */
-    private Optional<Person> getProgramAdmin(DelegateExecution execution) {
+    private Stream<Person> getProgramAdmin(DelegateExecution execution) {
         return getPeopleInRole(execution, PROGRAM_ADMIN)
-                .stream()
-                .findFirst();
+                .stream();
     }
 
     private Collection<SchoolPersonRole> getSchoolRolesInRole(DelegateExecution execution, RoleType type) {

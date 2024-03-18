@@ -113,9 +113,9 @@ public class ProgramAdminController {
     @DeleteMapping("/{programAdminId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('program-admin:delete')")
-    public void deactivatePersonnel(@PathVariable("schoolId") UUID schoolId,
+    public void deactivateProgramAdmin(@PathVariable("schoolId") UUID schoolId,
             @PathVariable("programAdminId") UUID programAdminId) {
-        log.debug("Deactivating personnel");
+        log.debug("Deactivating program admin");
         roleService.findRoleById(programAdminId)
                 .map(awsService::removeAwsUser)
                 .ifPresent(roleService::deactivateRole);
@@ -126,11 +126,11 @@ public class ProgramAdminController {
      *
      * @param schoolId The id of the school.
      * @param programAdminId The id of the program admin.
-     * @return The personnel if it could be found.
+     * @return The program admin if it could be found.
      */
     @GetMapping("/{programAdminId}")
     @PreAuthorize("hasAuthority('program-admin:read')")
-    public ProgramAdminResource getPersonnel(@PathVariable("schoolId") UUID schoolId,
+    public ProgramAdminResource getProgramAdmin(@PathVariable("schoolId") UUID schoolId,
             @PathVariable("programAdminId") UUID programAdminId) {
         return roleService.findRoleById(programAdminId)
                 .flatMap(programAdminAssembler::map)

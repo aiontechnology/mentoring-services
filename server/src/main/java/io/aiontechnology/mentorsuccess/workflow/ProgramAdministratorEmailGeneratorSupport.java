@@ -19,7 +19,9 @@ package io.aiontechnology.mentorsuccess.workflow;
 import io.aiontechnology.mentorsuccess.util.EmailAddress;
 import org.flowable.engine.delegate.DelegateExecution;
 
-import java.util.Optional;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public abstract class ProgramAdministratorEmailGeneratorSupport extends EmailGeneratorSupport {
 
@@ -30,13 +32,13 @@ public abstract class ProgramAdministratorEmailGeneratorSupport extends EmailGen
     @Override
     protected String getTo(DelegateExecution execution) {
         TaskUtilities taskUtilities = getTaskUtilities();
-        return Optional.ofNullable(taskUtilities.getProgramAdminEmail(execution))
+        Set<String> paEmailAddresses = taskUtilities.getProgramAdminEmails(execution).stream()
                 .map(EmailAddress::builder)
                 .map(builder -> builder.withName(taskUtilities.getProgramAdminFullName(execution)))
                 .map(EmailAddress.EmailAddressBuilder::build)
-                .map(Object::toString)
-                .orElseThrow(() -> new IllegalStateException("Unable to find the program administrator's email " +
-                        "address"));
+                .map(Objects::toString)
+                .collect(Collectors.toSet());
+        return String.join(",", paEmailAddresses);
     }
 
 }

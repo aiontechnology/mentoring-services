@@ -96,7 +96,7 @@ public class StudentInformationController {
     }
 
     /**
-     * Starts the registration process for a student in a school.
+     * Starts the process for collecting student information from a teacher.
      *
      * @param schoolId The ID of the school.
      * @param studentId The ID of the student.

@@ -50,6 +50,7 @@ public class InboundStudentTest extends BaseValidatorTest {
                 .withRegistrationSigned(true)
                 .withMediaReleaseSigned(true)
                 .withTeacher(inboundStudentTeacher)
+                .withBaseUri("http://test.com")
                 .build();
         InboundStudent nullFirstName = InboundStudent.builder()
                 .withFirstName(null)
@@ -59,6 +60,7 @@ public class InboundStudentTest extends BaseValidatorTest {
                 .withRegistrationSigned(true)
                 .withMediaReleaseSigned(true)
                 .withTeacher(inboundStudentTeacher)
+                .withBaseUri("http://test.com")
                 .build();
         InboundStudent firstNameTooLong = InboundStudent.builder()
                 .withFirstName("123456789012345678901234567890123456789012345678901") // 51 characters
@@ -68,6 +70,7 @@ public class InboundStudentTest extends BaseValidatorTest {
                 .withRegistrationSigned(true)
                 .withMediaReleaseSigned(true)
                 .withTeacher(inboundStudentTeacher)
+                .withBaseUri("http://test.com")
                 .build();
         InboundStudent nullLastName = InboundStudent.builder()
                 .withFirstName("FIRST")
@@ -77,6 +80,7 @@ public class InboundStudentTest extends BaseValidatorTest {
                 .withRegistrationSigned(true)
                 .withMediaReleaseSigned(true)
                 .withTeacher(inboundStudentTeacher)
+                .withBaseUri("http://test.com")
                 .build();
         InboundStudent lastNameTooLong = InboundStudent.builder()
                 .withFirstName("FIRST")
@@ -86,6 +90,7 @@ public class InboundStudentTest extends BaseValidatorTest {
                 .withRegistrationSigned(true)
                 .withMediaReleaseSigned(true)
                 .withTeacher(inboundStudentTeacher)
+                .withBaseUri("http://test.com")
                 .build();
         return Stream.of(ImmutablePair.of(idTooLong, "{student.id.size}"),
                 ImmutablePair.of(nullFirstName, "{student.firstname.notNull}"),
@@ -122,6 +127,7 @@ public class InboundStudentTest extends BaseValidatorTest {
                 .withRegistrationSigned(true)
                 .withMediaReleaseSigned(true)
                 .withTeacher(inboundStudentTeacher)
+                .withBaseUri("http://test.com")
                 .build();
 
         // execute the SUT

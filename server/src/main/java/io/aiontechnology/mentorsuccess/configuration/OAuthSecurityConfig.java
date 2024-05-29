@@ -64,6 +64,7 @@ public class OAuthSecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web -> web.ignoring()
                 .requestMatchers("/api/v1/schools/*/registrations/**")
+                .requestMatchers("/api/v1/schools/*/students/*/assessments/*")
                 .requestMatchers("/api/v1/schools/*/students/*/registrations/*")
                 .requestMatchers("/api/v1/schools/*/students/*/workflow/assessments/*")
                 .requestMatchers(GET, "/api/v1/schools/*/programAdmins")

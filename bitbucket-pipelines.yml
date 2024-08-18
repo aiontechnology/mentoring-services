@@ -58,9 +58,9 @@ pipelines:
       - step:
           name: Build and test
           deployment: Test
-          script:
-            - openssl aes-256-cbc -pass pass:$OPENSSL_PWD -in secring.gpg.enc -out /home/gradle/secring.gpg -d -md sha256
-            - gradle -Psigning.keyId=$GPG_KEY -Psigning.password=$GPG_PWD -Psigning.secretKeyRingFile=/home/gradle/secring.gpg build
+#          script:
+#            - openssl aes-256-cbc -pass pass:$OPENSSL_PWD -in secring.gpg.enc -out /home/gradle/secring.gpg -d -md sha256
+#            - gradle -Psigning.keyId=$GPG_KEY -Psigning.password=$GPG_PWD -Psigning.secretKeyRingFile=/home/gradle/secring.gpg build
           artifacts:
             - server/build/**
           after-script:

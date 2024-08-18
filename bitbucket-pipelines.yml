@@ -43,7 +43,7 @@ pipelines:
             - docker
           script:
             - cd server
-            - IMAGE="661143960593.dkr.ecr.us-west-2.amazonaws.com/mentorsuccess-server"
+            - IMAGE="881490093754.dkr.ecr.us-west-2.amazonaws.com/services"
             - BRANCH=$(echo $BITBUCKET_BRANCH | sed "s/[^a-zA-Z0-9]/_/g")
             - TAG="$BRANCH-build.$BITBUCKET_BUILD_NUMBER"
             - aws ecr get-login-password | docker login --username AWS --password-stdin 661143960593.dkr.ecr.us-west-2.amazonaws.com

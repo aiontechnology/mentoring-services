@@ -58,22 +58,14 @@ pipelines:
       - step:
           name: Build and test
           deployment: Test
-#          script:
-#            - openssl aes-256-cbc -pass pass:$OPENSSL_PWD -in secring.gpg.enc -out /home/gradle/secring.gpg -d -md sha256
-#            - gradle -Psigning.keyId=$GPG_KEY -Psigning.password=$GPG_PWD -Psigning.secretKeyRingFile=/home/gradle/secring.gpg build
+          script:
+            - gradle build
           artifacts:
             - server/build/**
           after-script:
             - pipe: atlassian/checkstyle-report:0.2.1
               variables:
                 CHECKSTYLE_RESULT_PATTERN: '.*/checkstyle.xml$'
-      - step:
-          name: Deploy to Maven Central
-          caches:
-            - gradle
-          script:
-            - openssl aes-256-cbc -pass pass:$OPENSSL_PWD -in secring.gpg.enc -out /home/gradle/secring.gpg -d -md sha256
-            - gradle -Psigning.keyId=$GPG_KEY -Psigning.password=$GPG_PWD -Psigning.secretKeyRingFile=/home/gradle/secring.gpg publish
       - step:
           name: Deploy
           image: amazon/aws-cli

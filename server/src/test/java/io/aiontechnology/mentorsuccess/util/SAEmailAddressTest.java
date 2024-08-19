@@ -46,7 +46,7 @@ public class SAEmailAddressTest {
         var result = saEmailAddress.build().toString();
 
         // validation
-        assertThat(result).isEqualTo("MentorSuccess™ System Administrator <mentorsuccess@hisheartfoundation.org>");
+        assertThat(result).isEqualTo("The Live Your Dreams Foundation™ System Administrator <dev@aiontechnology.io>");
     }
 
     @Test
@@ -59,7 +59,7 @@ public class SAEmailAddressTest {
         var result = saEmailAddress.build().toString();
 
         // validation
-        assertThat(result).isEqualTo("MentorSuccess™ System Administrator <mentorsuccess+tag@hisheartfoundation.org>");
+        assertThat(result).isEqualTo("The Live Your Dreams Foundation™ System Administrator <dev+tag@aiontechnology.io>");
     }
 
     @Test
@@ -72,7 +72,7 @@ public class SAEmailAddressTest {
         var result = saEmailAddress.build().toString();
 
         // validation
-        assertThat(result).isEqualTo("MentorSuccess™ System Administrator <mentorsuccess+tag@hisheartfoundation.org>");
+        assertThat(result).isEqualTo("The Live Your Dreams Foundation™ System Administrator <dev+tag@aiontechnology.io>");
     }
 
 }

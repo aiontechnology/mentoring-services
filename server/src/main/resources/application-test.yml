@@ -17,7 +17,7 @@ aws:
     clientId: clientId
     clientSecret: clientSecret
     region: us-west-2
-    userPoolId: us-west-2_EBQBuK2yn
+    userPoolId: us-west-2_PN5WtXF09
 
 addUserToGroupResultlogging:
   level:

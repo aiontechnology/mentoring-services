@@ -28,7 +28,7 @@ import static io.aiontechnology.mentorsuccess.workflow.RegistrationWorkflowConst
 
 public abstract class EmailGeneratorSupport implements JavaDelegate {
 
-    public static final String DEFAULT_FROM_EMAIL_ADDRESS = "MentorSuccess™ <mentorsuccess@hisheartfoundation.org>";
+    public static final String DEFAULT_FROM_EMAIL_ADDRESS = "The Live Your Dreams Foundation™ <dev@aiontechnology.io>";
 
     private Expression generationStrategyClassName;
 

@@ -37,7 +37,7 @@
                       name="Send Invitation 1"
                       calledElement="invite-student">
             <extensionElements>
-                <flowable:in sourceExpression="io.aiontechnology.mentorsuccess.velocity.StudentInvitationEmailGenerator"
+                <flowable:in sourceExpression="io.aiontechnology.mentoring.velocity.StudentInvitationEmailGenerator"
                              target="generationStrategyClassName"/>
                 <flowable:in source="schoolId" target="schoolId"/>
                 <flowable:in source="schoolEmailTag" target="schoolEmailTag"/>
@@ -51,7 +51,7 @@
                       name="Receive Registration 1"
                       calledElement="register-and-notify">
             <extensionElements>
-                <flowable:in sourceExpression="io.aiontechnology.mentorsuccess.velocity.RegistrationCompleteEmailGenerator"
+                <flowable:in sourceExpression="io.aiontechnology.mentoring.velocity.RegistrationCompleteEmailGenerator"
                              target="generationStrategyClassName"/>
                 <flowable:in source="schoolId" target="schoolId"/>
                 <flowable:in source="schoolEmailTag" target="schoolEmailTag"/>
@@ -82,7 +82,7 @@
                       name="Send Invitation 2"
                       calledElement="invite-student">
             <extensionElements>
-                <flowable:in sourceExpression="io.aiontechnology.mentorsuccess.velocity.StudentInvitationEmailGenerator"
+                <flowable:in sourceExpression="io.aiontechnology.mentoring.velocity.StudentInvitationEmailGenerator"
                              target="generationStrategyClassName"/>
                 <flowable:in source="schoolId" target="schoolId"/>
                 <flowable:in source="schoolEmailTag" target="schoolEmailTag"/>
@@ -96,7 +96,7 @@
                       name="Receive Registration 2"
                       calledElement="register-and-notify">
             <extensionElements>
-                <flowable:in sourceExpression="io.aiontechnology.mentorsuccess.velocity.RegistrationCompleteEmailGenerator"
+                <flowable:in sourceExpression="io.aiontechnology.mentoring.velocity.RegistrationCompleteEmailGenerator"
                              target="generationStrategyClassName"/>
                 <flowable:in source="schoolId" target="schoolId"/>
                 <flowable:in source="schoolEmailTag" target="schoolEmailTag"/>
@@ -131,7 +131,7 @@
             </documentation>
             <extensionElements>
                 <flowable:field name="generationStrategyClassName"
-                                stringValue="io.aiontechnology.mentorsuccess.velocity.RegistrationTimeoutEmailGenerator"/>
+                                stringValue="io.aiontechnology.mentoring.velocity.RegistrationTimeoutEmailGenerator"/>
             </extensionElements>
         </serviceTask>
 
@@ -168,7 +168,7 @@
             </documentation>
             <extensionElements>
                 <flowable:field name="generationStrategyClassName"
-                                stringValue="io.aiontechnology.mentorsuccess.velocity.RegistrationCancellationEmailGenerator"/>
+                                stringValue="io.aiontechnology.mentoring.velocity.RegistrationCancellationEmailGenerator"/>
             </extensionElements>
         </serviceTask>
 

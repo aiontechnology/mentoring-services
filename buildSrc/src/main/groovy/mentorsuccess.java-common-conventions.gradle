@@ -19,15 +19,12 @@ plugins {
     id 'io.spring.dependency-management'
 }
 
-group = 'io.aiontechnology.mentorsuccess'
+group = 'io.aiontechnology.mentoring'
 version = "${version}"
 
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
-    }
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 

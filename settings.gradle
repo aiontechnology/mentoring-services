@@ -21,5 +21,5 @@ plugins {
     id 'org.gradle.toolchains.foojay-resolver-convention' version "$foojayResolverConventionVersion"
 }
 
-rootProject.name = 'mentorsuccess'
+rootProject.name = 'mentoring'
 include 'server', 'model-lib', 'client-lib'

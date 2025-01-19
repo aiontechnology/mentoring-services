@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Aion Technology LLC
+// Copyright 2020-2025 Aion Technology LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.api.artifacts.repositories.PasswordCredentials
-
 plugins {
     id 'maven-publish'
     id 'signing'
@@ -22,12 +19,12 @@ plugins {
 
 publishing {
     publications {
-        mentorsuccess(MavenPublication) {
+        mentoring(MavenPublication) {
             from components.java
             pom {
-                name = 'MentorSuccess'
-                description = 'MentorSuccess services project'
-                url = 'https://bitbucket.org/hisheartfoundation/mentorsuccess-services'
+                name = 'Mentoring'
+                description = 'Mentoring services project'
+                url = 'https://github.com/aiontechnology/mentoring-services'
                 versionMapping {
                     usage('java-runtime') {
                         fromResolutionResult()
@@ -49,28 +46,29 @@ publishing {
                     }
                 }
                 scm {
-                    connection = 'scm:git:git://bitbucket.org:hisheartfoundation/mentorsuccess-services.git'
-                    developerConnection = 'scm:git:ssh://bitbucket.org:hisheartfoundation/mentorsuccess-services.git'
-                    url = 'https://bitbucket.org/hisheartfoundation/mentorsuccess-services/src/master'
+                    connection = 'scm:git:git@github.com:aiontechnology/mentoring-services.git'
+                    developerConnection = 'scm:git:ssh://github.com:aiontechnology/mentoring-services.git'
+                    url = 'https://github.com/aiontechnology/mentoring-services'
                 }
             }
         }
     }
     repositories {
         maven {
-            credentials(PasswordCredentials) {
-                username = System.getenv('ossrhUsername')
-                password = System.getenv('ossrhPassword')
-            }
+            name = "OSSRH"
             if (version.endsWith('SNAPSHOT')) {
                 url = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
             } else {
                 url = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+            }
+            credentials {
+                username = System.getenv('OSSRH_USERNAME')
+                password = System.getenv('OSSRH_PASSWORD')
             }
         }
     }
 }
 
 signing {
-    sign publishing.publications.mentorsuccess
+    sign publishing.publications.mentoring
 }

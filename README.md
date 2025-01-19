@@ -1,6 +1,6 @@
 # About
 
-This project vents a REST API for use with the MentorSuccess front end. It uses 
+This project vends a REST API for use with the mentoring front end. It uses 
 the following technologies:
 
 1. Java 14

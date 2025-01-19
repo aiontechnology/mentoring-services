@@ -46,7 +46,7 @@
             </documentation>
             <extensionElements>
                 <flowable:field name="generationStrategyClassName"
-                                stringValue="io.aiontechnology.mentorsuccess.velocity.StudentInfoTimeoutEmailGenerator"/>
+                                stringValue="io.aiontechnology.mentoring.velocity.StudentInfoTimeoutEmailGenerator"/>
             </extensionElements>
         </serviceTask>
 
@@ -79,7 +79,7 @@
                       name="Request Student Assessment 1"
                       calledElement="assessment-contact-teacher">
             <extensionElements>
-                <flowable:in sourceExpression="io.aiontechnology.mentorsuccess.velocity.TeacherPostAssessmentEmailGenerator"
+                <flowable:in sourceExpression="io.aiontechnology.mentoring.velocity.TeacherPostAssessmentEmailGenerator"
                              target="generationStrategyClassName"/>
                 <flowable:in source="schoolId" target="schoolId"/>
                 <flowable:in source="schoolEmailTag" target="schoolEmailTag"/>
@@ -94,7 +94,7 @@
                       name="Receive Assessment 1"
                       calledElement="assessment-record-and-notify">
             <extensionElements>
-                <flowable:in sourceExpression="io.aiontechnology.mentorsuccess.feature.workflow.velocity.PostAssessmentCompleteEmailGenerator"
+                <flowable:in sourceExpression="io.aiontechnology.mentoring.feature.workflow.velocity.PostAssessmentCompleteEmailGenerator"
                              target="generationStrategyClassName"/>
                 <flowable:in source="schoolId" target="schoolId"/>
                 <flowable:in source="schoolEmailTag" target="schoolEmailTag"/>
@@ -114,7 +114,7 @@
                       name="Request Student Assessment 2"
                       calledElement="assessment-contact-teacher">
             <extensionElements>
-                <flowable:in sourceExpression="io.aiontechnology.mentorsuccess.velocity.TeacherPostAssessmentEmailGenerator"
+                <flowable:in sourceExpression="io.aiontechnology.mentoring.velocity.TeacherPostAssessmentEmailGenerator"
                              target="generationStrategyClassName"/>
                 <flowable:in source="schoolId" target="schoolId"/>
                 <flowable:in source="schoolEmailTag" target="schoolEmailTag"/>
@@ -129,7 +129,7 @@
                       name="Receive Assessment 2"
                       calledElement="assessment-record-and-notify">
             <extensionElements>
-                <flowable:in sourceExpression="io.aiontechnology.mentorsuccess.feature.workflow.velocity.PostAssessmentCompleteEmailGenerator"
+                <flowable:in sourceExpression="io.aiontechnology.mentoring.feature.workflow.velocity.PostAssessmentCompleteEmailGenerator"
                              target="generationStrategyClassName"/>
                 <flowable:in source="schoolId" target="schoolId"/>
                 <flowable:in source="schoolEmailTag" target="schoolEmailTag"/>
@@ -153,7 +153,7 @@
             </documentation>
             <extensionElements>
                 <flowable:field name="generationStrategyClassName"
-                                stringValue="io.aiontechnology.mentorsuccess.velocity.TeacherInvalidEmailGenerator"/>
+                                stringValue="io.aiontechnology.mentoring.velocity.TeacherInvalidEmailGenerator"/>
             </extensionElements>
         </serviceTask>
 
